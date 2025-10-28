@@ -4,537 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>在线考试-学生端 v1.8</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* 基础样式 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            color: #2d3748;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        header {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h1 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            font-size: 2.5em;
-            font-weight: 600;
-        }
-
-        .version {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.6em;
-            font-weight: 500;
-        }
-
-        .welcome-section {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .welcome-section h2 {
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-size: 2em;
-        }
-
-        .welcome-section p {
-            color: #718096;
-            font-size: 1.1em;
-            margin-bottom: 30px;
-        }
-
-        .step-header {
-            margin-bottom: 30px;
-        }
-
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            margin: 0 20px;
-        }
-
-        .step-number {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e2e8f0;
-            color: #718096;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .step.active .step-number {
-            background: #667eea;
-            color: white;
-        }
-
-        .step.completed .step-number {
-            background: #48bb78;
-            color: white;
-        }
-
-        .step-line {
-            width: 60px;
-            height: 2px;
-            background: #e2e8f0;
-            margin: 0 10px;
-        }
-
-        .step.active .step-line {
-            background: #667eea;
-        }
-
-        .step.completed .step-line {
-            background: #48bb78;
-        }
-
-        .verification-form, .student-form {
-            background: #f8fafc;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .verification-form h3, .student-form h3 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #718096;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #4a5568;
-            transform: translateY(-2px);
-        }
-
-        .exam-header {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .exam-header.active {
-            display: block;
-        }
-
-        .exam-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .exam-title {
-            font-size: 1.8em;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .student-info {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .student-details {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f8fafc;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            color: #4a5568;
-        }
-
-        .student-details::before {
-            content: "👤";
-            font-size: 1.2em;
-        }
-
-        .student-name::before {
-            content: "姓名：";
-        }
-
-        .student-id::before {
-            content: "学号：";
-        }
-
-        .exam-code::before {
-            content: "考号：";
-        }
-
-        .exam-progress {
-            margin-bottom: 20px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            text-align: center;
-            margin-top: 10px;
-            color: #4a5568;
-            font-weight: 600;
-        }
-
-        .exam-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .exam-content.active {
-            display: block;
-        }
-
-        .exam-question {
-            margin-bottom: 30px;
-        }
-
-        .exam-question h3 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            line-height: 1.5;
-        }
-
-        .exam-options {
-            display: grid;
-            gap: 15px;
-        }
-
-        .exam-option {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .exam-option:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .exam-option.selected {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .exam-option input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            margin: 0;
-        }
-
-        .exam-option label {
-            flex: 1;
-            cursor: pointer;
-            font-weight: 500;
-            color: #2d3748;
-        }
-
-        .exam-controls {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .result-header {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            display: none;
-        }
-
-        .result-header.active {
-            display: block;
-        }
-
-        .result-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
-        }
-
-        .icon-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
-
-        .icon-circle.excellent {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        }
-
-        .icon-circle.good {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-        }
-
-        .icon-circle.poor {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-        }
-
-        .icon {
-            font-size: 3em;
-            color: white;
-        }
-
-        .result-summary h2 {
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-size: 2em;
-        }
-
-        .result-details {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .score {
-            background: #f8fafc;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .result-actions {
-            margin-top: 30px;
-        }
-
-        .exam-list {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .exam-list.active {
-            display: block;
-        }
-
-        .exam-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .exam-item {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            min-height: 150px;
-        }
-
-        .exam-item:hover {
-            border-color: #667eea;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
-        }
-
-        .exam-item h4 {
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-            font-weight: 600;
-        }
-
-        .exam-meta {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .exam-meta p {
-            color: #718096;
-            font-size: 0.9em;
-            margin: 0;
-        }
-
-        .exam-status {
-            margin-top: 15px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .exam-status.published {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .exam-status.unpublished {
-            background: #fed7d7;
-            color: #742a2a;
-        }
-
+        /* 配置提示样式 */
         .config-message {
             background: white;
             border-radius: 15px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 30px;
             text-align: center;
-            display: none;
-        }
-
-        .config-message.active {
-            display: block;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .config-message h3 {
-            color: #2d3748;
+            color: #e53e3e;
             margin-bottom: 20px;
             font-size: 1.5em;
         }
 
         .config-message p {
-            color: #718096;
-            margin-bottom: 30px;
+            color: #4a5568;
+            margin-bottom: 15px;
             line-height: 1.6;
         }
 
+        /* 答题进度样式 */
+        .question-progress-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .answered-count {
+            color: #38a169;
+        }
+
+        .unanswered-count {
+            font-weight: bold;
+        }
+
+        /* 分数显示样式 */
+        .score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-summary {
+            text-align: center;
+            margin: 20px 0;
+        }
+
         .config-steps {
+            margin: 25px 0;
             text-align: left;
-            max-width: 600px;
-            margin: 0 auto;
         }
 
         .step {
@@ -570,16 +112,6 @@
             color: #4a5568;
         }
 
-        .step-content a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .step-content a:hover {
-            text-decoration: underline;
-        }
-
         .step-content code {
             background: #e2e8f0;
             padding: 4px 8px;
@@ -608,57 +140,6 @@
             background: #5a67d8;
             transform: translateY(-2px);
         }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            header {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            .step-indicator {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .step {
-                margin: 0;
-            }
-
-            .step-line {
-                display: none;
-            }
-
-            .exam-info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .student-info {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .result-details {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .exam-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .exam-controls {
-                flex-direction: column;
-            }
-        }
     </style>
 </head>
 <body>
@@ -667,138 +148,133 @@
             <h1>在线考试-学生端 <span class="version">v1.8</span></h1>
         </header>
 
-        <!-- 欢迎区域 -->
+        <!-- 欢迎界面 -->
         <div class="welcome-section" id="welcomeSection">
-            <h2>欢迎参加在线考试</h2>
-            <p>请按照以下步骤完成考试</p>
+            <div class="welcome-content">
+                <h2>欢迎参加在线考试</h2>
+                <p>请选择您要参加的考试</p>
+            </div>
             
-            <div class="step-indicator">
-                <div class="step" id="step1">
-                    <div class="step-number">1</div>
-                    <span>验证考号</span>
-                </div>
-                <div class="step-line"></div>
-                <div class="step" id="step2">
-                    <div class="step-number">2</div>
-                    <span>填写信息</span>
-                </div>
-                <div class="step-line"></div>
-                <div class="step" id="step3">
-                    <div class="step-number">3</div>
-                    <span>开始考试</span>
+            <div class="exam-list">
+                <div class="exam-grid" id="availableExams">
+                    <!-- 可用考试列表将在这里显示 -->
                 </div>
             </div>
         </div>
 
-        <!-- 考号验证表单 -->
-        <div class="verification-form" id="verificationForm">
-            <h3>步骤1：验证考号</h3>
-            <div class="form-group">
-                <label for="examCode">请输入您的考号：</label>
-                <input type="text" id="examCode" placeholder="例如：001">
-            </div>
-            <button class="btn btn-primary" onclick="examClient.verifyExamCode()">验证考号</button>
-        </div>
-
-        <!-- 学生信息表单 -->
-        <div class="student-form" id="studentForm" style="display: none;">
-            <h3>步骤2：填写个人信息</h3>
-            <div class="form-group">
-                <label for="studentName">姓名：</label>
-                <input type="text" id="studentName" placeholder="请输入您的姓名">
-            </div>
-            <div class="form-group">
-                <label for="studentId">学号：</label>
-                <input type="text" id="studentId" placeholder="请输入您的学号">
-            </div>
-            <button class="btn btn-primary" onclick="examClient.submitStudentInfo()">确认信息</button>
-        </div>
-
-        <!-- 考试列表 -->
-        <div class="exam-list" id="examList">
-            <h3>步骤3：选择考试</h3>
-            <div class="exam-grid" id="availableExams">
-                <!-- 考试列表将在这里显示 -->
-            </div>
-        </div>
-
-        <!-- 考试头部信息 -->
-        <div class="exam-header" id="examHeader">
-            <div class="exam-info">
-                <div class="exam-title" id="examTitle">考试名称</div>
-                <div class="student-info">
-                    <div class="student-details student-name" id="studentNameDisplay">姓名：-</div>
-                    <div class="student-details student-id" id="studentIdDisplay">学号：-</div>
-                    <div class="student-details exam-code" id="examCodeDisplay">考号：-</div>
+        <!-- 考号验证界面 -->
+        <div class="verification-section" id="verificationSection" style="display: none;">
+            <div class="step-header">
+                <h2>考号验证</h2>
+                <div class="step-indicator">
+                    <div class="step active">1</div>
+                    <div class="step-line"></div>
+                    <div class="step">2</div>
+                    <div class="step-line"></div>
+                    <div class="step">3</div>
                 </div>
             </div>
-            <div class="exam-progress">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            
+            <div class="verification-form">
+                <h3 id="verificationExamName">考试名称</h3>
+                <p>请输入您的考号</p>
+                <input type="text" id="examCodeInput" placeholder="请输入考号">
+                <div class="form-actions">
+                    <button id="verifyCodeBtn" class="btn btn-primary">验证考号</button>
+                    <button id="backToExamSelectionBtn" class="btn btn-secondary">返回考试选择</button>
                 </div>
-                <div class="progress-text" id="progressText">0 / 0</div>
             </div>
         </div>
 
-        <!-- 考试内容 -->
-        <div class="exam-content" id="examContent">
-            <div class="exam-question" id="questionContainer">
-                <!-- 题目将在这里显示 -->
+        <!-- 学生信息界面 -->
+        <div class="student-section" id="studentSection" style="display: none;">
+            <div class="step-header">
+                <h2>学生信息</h2>
+                <div class="step-indicator">
+                    <div class="step completed">1</div>
+                    <div class="step-line"></div>
+                    <div class="step active">2</div>
+                    <div class="step-line"></div>
+                    <div class="step">3</div>
+                </div>
             </div>
-            <div class="exam-controls">
-                <button class="btn btn-secondary" id="prevBtn" onclick="examClient.previousQuestion()" disabled>上一题</button>
-                <button class="btn btn-primary" id="nextBtn" onclick="examClient.nextQuestion()">下一题</button>
-                <button class="btn btn-primary" id="submitBtn" onclick="examClient.submitExam()" style="display: none;">提交试卷</button>
+            
+            <div class="student-form">
+                <h3 id="studentExamName">考试名称</h3>
+                <p>请填写您的个人信息</p>
+                <div class="form-group">
+                    <label for="studentName">姓名：</label>
+                    <input type="text" id="studentName" placeholder="请输入您的姓名" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentId">学号：</label>
+                    <input type="text" id="studentId" placeholder="请输入您的学号" required>
+                </div>
+                <div class="form-actions">
+                    <button id="startExamBtn" class="btn btn-primary">开始考试</button>
+                    <button id="backToCodeVerificationBtn" class="btn btn-secondary">返回考号验证</button>
+                </div>
             </div>
         </div>
 
-        <!-- 考试结果 -->
-        <div class="result-header" id="resultHeader">
-            <div class="result-icon">
-                <div class="icon-circle" id="resultIcon">
-                    <div class="icon" id="resultIconSymbol">📊</div>
+        <!-- 考试界面 -->
+        <div class="exam-section" id="examSection" style="display: none;">
+            <div class="exam-header">
+                <div class="exam-info">
+                    <h2 id="examTitle">考试进行中</h2>
+                    <div class="student-info">
+                        <div class="student-details">
+                            <span class="student-name" id="studentNameDisplay">学生姓名</span>
+                            <span class="student-id" id="studentIdDisplay">学号</span>
+                            <span class="exam-code" id="examCodeDisplay">考号</span>
+                        </div>
+                    </div>
+                    <div class="exam-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text">题目 <span id="currentQuestionNum">1</span> / <span id="totalQuestions">0</span></span>
+                    </div>
                 </div>
             </div>
-            <div class="result-summary">
+
+            <div class="exam-content">
+                <div class="exam-question" id="questionContainer">
+                    <!-- 题目内容将在这里显示 -->
+                </div>
+                
+                <div class="exam-controls">
+                    <button id="prevBtn" class="btn btn-secondary" disabled>上一题</button>
+                    <button id="nextBtn" class="btn btn-primary">下一题</button>
+                    <button id="submitExamBtn" class="btn btn-success">提交考试</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果界面 -->
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="result-header">
+                <div class="result-icon">
+                    <div class="icon-circle">
+                        <div class="icon" id="resultIcon">✓</div>
+                    </div>
+                </div>
                 <h2 id="resultTitle">考试完成</h2>
-                <div class="result-details">
-                    <div class="score" id="scoreDisplay">得分：0 / 0</div>
-                </div>
             </div>
-            <div class="result-actions">
-                <button class="btn btn-primary" onclick="examClient.restartExam()">重新开始</button>
-            </div>
-        </div>
 
-        <!-- 配置提示信息 -->
-        <div class="config-message" id="configMessage">
-            <h3>云端配置未完成</h3>
-            <p>管理员需要先配置云端存储，才能使用在线考试功能。</p>
-            <div class="config-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <p>管理员访问 <a href="cloud-exam-system.html" target="_blank">管理后台</a></p>
-                    </div>
+            <div class="result-summary">
+                <div class="score" id="scoreDisplay">0 / 0</div>
+                <div class="result-details">
+                    <p>姓名：<span id="resultStudentName">-</span></p>
+                    <p>学号：<span id="resultStudentId">-</span></p>
+                    <p>考号：<span id="resultExamCode">-</span></p>
+                    <p>完成时间：<span id="resultTime">-</span></p>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <p>在"云端配置"面板中设置JSONBin.io的URL和Key</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <p>将生成的 <code>cloud-config.json</code> 文件放在服务器根目录</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <p>刷新此页面即可正常使用</p>
-                    </div>
-                </div>
+            </div>
+
+            <div class="result-actions">
+                <button id="retakeExamBtn" class="btn btn-primary">重新考试</button>
+                <button id="backToSelectionBtn" class="btn btn-secondary">返回考试选择</button>
             </div>
         </div>
     </div>
@@ -810,12 +286,24 @@
                 this.binUrl = null;
                 this.secretKey = null;
                 this.isConnected = false;
+                this.loadConfig();
             }
 
-            setConfig(binUrl, secretKey) {
-                this.binUrl = binUrl;
-                this.secretKey = secretKey;
-                this.isConnected = !!binUrl && !!secretKey;
+            loadConfig() {
+                const config = localStorage.getItem('cloudConfig');
+                if (config) {
+                    try {
+                        const parsed = JSON.parse(config);
+                        this.binUrl = parsed.binUrl;
+                        this.secretKey = parsed.secretKey;
+                        this.isConnected = !!this.binUrl && !!this.secretKey;
+                    } catch (error) {
+                        console.error('配置解析失败：', error);
+                        this.binUrl = null;
+                        this.secretKey = null;
+                        this.isConnected = false;
+                    }
+                }
             }
 
             async getData() {
@@ -881,53 +369,57 @@
                 this.currentStudent = null;
                 this.selectedExamId = null;
                 this.verifiedExamCode = null;
-                this.currentStep = 1;
-
+                
                 this.init();
             }
 
             async init() {
-                await this.loadData();
                 this.bindEvents();
-                this.updateStepIndicator();
+                await this.loadData();
+                this.displayAvailableExams();
             }
 
             async loadData() {
                 try {
-                    // 首先尝试从localStorage加载配置
-                    this.loadCloudConfig();
+                    // 首先尝试从本地加载配置
+                    await this.loadCloudConfig();
                     
-                    if (!this.cloudManager.isConnected) {
-                        // 如果localStorage没有配置，尝试从服务器获取
+                    if (this.cloudManager.isConnected) {
+                        console.log('从云端加载数据...');
+                        const data = await this.cloudManager.getData();
+                        this.exams = data.exams || [];
+                        this.results = data.results || [];
+                        console.log('云端数据加载成功，考试数量：', this.exams.length);
+                    } else {
+                        console.log('本地无配置，尝试从云端获取公开配置...');
                         await this.tryGetPublicConfig();
+                        
+                        if (this.cloudManager.isConnected) {
+                            console.log('获取公开配置成功，加载数据...');
+                            const data = await this.cloudManager.getData();
+                            this.exams = data.exams || [];
+                            this.results = data.results || [];
+                            console.log('云端数据加载成功，考试数量：', this.exams.length);
+                        } else {
+                            console.log('无法获取云端配置，显示配置提示');
+                            this.showConfigMessage();
+                        }
                     }
-                    
-                    if (!this.cloudManager.isConnected) {
-                        // 如果还是没有配置，显示配置提示
-                        this.showConfigMessage();
-                        return;
-                    }
-
-                    // 加载云端数据
-                    const data = await this.cloudManager.getData();
-                    this.exams = data.exams || [];
-                    this.results = data.results || [];
-                    
-                    console.log('云端数据加载成功');
-                    this.displayAvailableExams();
                 } catch (error) {
                     console.error('加载数据失败：', error);
                     this.showConfigMessage();
                 }
             }
 
-            loadCloudConfig() {
+            async loadCloudConfig() {
                 const config = localStorage.getItem('cloudConfig');
                 if (config) {
                     try {
                         const parsed = JSON.parse(config);
-                        this.cloudManager.setConfig(parsed.binUrl, parsed.secretKey);
-                        console.log('从localStorage加载配置成功');
+                        this.cloudManager.binUrl = parsed.binUrl;
+                        this.cloudManager.secretKey = parsed.secretKey;
+                        this.cloudManager.isConnected = !!this.cloudManager.binUrl && !!this.cloudManager.secretKey;
+                        console.log('本地配置加载成功：', this.cloudManager.isConnected);
                     } catch (error) {
                         console.error('配置解析失败：', error);
                     }
@@ -936,299 +428,84 @@
 
             async tryGetPublicConfig() {
                 try {
-                    const response = await fetch('./cloud-config.json');
+                    // 尝试从localStorage获取公开配置
+                    const publicConfig = localStorage.getItem('publicCloudConfig');
+                    if (publicConfig) {
+                        const config = JSON.parse(publicConfig);
+                        this.cloudManager.binUrl = config.binUrl;
+                        this.cloudManager.secretKey = config.secretKey;
+                        this.cloudManager.isConnected = !!this.cloudManager.binUrl && !!this.cloudManager.secretKey;
+                        console.log('从本地获取公开配置成功：', this.cloudManager.isConnected);
+                        return;
+                    }
+                    
+                    // 尝试从JSON文件获取配置
+                    console.log('尝试从cloud-config.json获取配置...');
+                    const response = await fetch('cloud-config.json');
                     if (response.ok) {
                         const config = await response.json();
-                        if (config.binUrl && config.secretKey) {
-                            this.cloudManager.setConfig(config.binUrl, config.secretKey);
-                            console.log('从服务器加载配置成功');
-                            return true;
+                        if (config.status === 'configured' && config.binUrl && config.secretKey) {
+                            this.cloudManager.binUrl = config.binUrl;
+                            this.cloudManager.secretKey = config.secretKey;
+                            this.cloudManager.isConnected = true;
+                            console.log('从JSON文件获取配置成功');
+                            return;
                         }
                     }
+                    
+                    // 如果都失败了，显示配置提示
+                    this.showConfigMessage();
                 } catch (error) {
-                    console.error('从服务器获取配置失败：', error);
+                    console.error('获取公开配置失败：', error);
+                    this.showConfigMessage();
                 }
-                return false;
             }
 
             showConfigMessage() {
-                document.getElementById('configMessage').classList.add('active');
-                document.getElementById('welcomeSection').style.display = 'none';
-                document.getElementById('verificationForm').style.display = 'none';
-            }
-
-            bindEvents() {
-                // 考号输入框回车事件
-                document.getElementById('examCode').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        this.verifyExamCode();
-                    }
-                });
-
-                // 学生信息输入框回车事件
-                document.getElementById('studentName').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        this.submitStudentInfo();
-                    }
-                });
-
-                document.getElementById('studentId').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        this.submitStudentInfo();
-                    }
-                });
-            }
-
-            updateStepIndicator() {
-                // 更新步骤指示器
-                for (let i = 1; i <= 3; i++) {
-                    const step = document.getElementById(`step${i}`);
-                    if (i < this.currentStep) {
-                        step.classList.add('completed');
-                        step.classList.remove('active');
-                    } else if (i === this.currentStep) {
-                        step.classList.add('active');
-                        step.classList.remove('completed');
-                    } else {
-                        step.classList.remove('active', 'completed');
-                    }
-                }
-            }
-
-            verifyExamCode() {
-                const examCode = document.getElementById('examCode').value.trim();
-                if (!examCode) {
-                    alert('请输入考号！');
-                    return;
-                }
-
-                // 检查考号是否在已发布的考试中
-                const validExams = this.exams.filter(exam => 
-                    exam.isPublished && exam.allowedCodes.includes(examCode)
-                );
-
-                if (validExams.length === 0) {
-                    alert('考号无效或没有可用的考试！');
-                    return;
-                }
-
-                this.verifiedExamCode = examCode;
-                this.currentStep = 2;
-                this.updateStepIndicator();
-                
-                document.getElementById('verificationForm').style.display = 'none';
-                document.getElementById('studentForm').style.display = 'block';
-            }
-
-            submitStudentInfo() {
-                const studentName = document.getElementById('studentName').value.trim();
-                const studentId = document.getElementById('studentId').value.trim();
-
-                if (!studentName || !studentId) {
-                    alert('请填写完整的个人信息！');
-                    return;
-                }
-
-                this.currentStudent = {
-                    name: studentName,
-                    id: studentId,
-                    examCode: this.verifiedExamCode
-                };
-
-                this.currentStep = 3;
-                this.updateStepIndicator();
-                
-                document.getElementById('studentForm').style.display = 'none';
-                document.getElementById('examList').classList.add('active');
-                this.displayAvailableExams();
-            }
-
-            displayAvailableExams() {
                 const container = document.getElementById('availableExams');
-                const validExams = this.exams.filter(exam => 
-                    exam.isPublished && exam.allowedCodes.includes(this.verifiedExamCode)
-                );
-
-                if (validExams.length === 0) {
-                    container.innerHTML = '<p>暂无可用考试</p>';
-                    return;
-                }
-
-                container.innerHTML = validExams.map(exam => `
-                    <div class="exam-item" onclick="examClient.startExam(${exam.id})">
-                        <h4>${exam.name}</h4>
-                        <div class="exam-meta">
-                            <p>题目数量：${exam.questions.length} 道</p>
-                            <p>考号范围：${exam.allowedCodes.join(', ')}</p>
+                container.innerHTML = `
+                    <div class="config-message">
+                        <h3>⚠️ 需要云端配置</h3>
+                        <p>学生端需要连接到云端才能看到考试题目。</p>
+                        <p>请管理员按以下步骤配置：</p>
+                        <div class="config-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <p>管理员打开管理端：<code>cloud-exam-system.html</code></p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <p>在"云端配置"面板中配置JSONBin.io</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <p>点击"测试连接"后会自动下载配置文件</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <p>将下载的<code>cloud-config.json</code>文件放在服务器根目录</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <p>刷新学生端页面即可看到考试题目</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="exam-status published">已发布</div>
-                    </div>
-                `).join('');
-            }
-
-            startExam(examId) {
-                const exam = this.exams.find(e => e.id === examId);
-                if (!exam) {
-                    alert('考试不存在！');
-                    return;
-                }
-
-                if (exam.questions.length === 0) {
-                    alert('该考试暂无题目！');
-                    return;
-                }
-
-                this.selectedExamId = examId;
-                this.currentQuestionIndex = 0;
-                this.studentAnswers = {};
-
-                // 更新考试头部信息
-                document.getElementById('examTitle').textContent = exam.name;
-                document.getElementById('studentNameDisplay').textContent = `姓名：${this.currentStudent.name}`;
-                document.getElementById('studentIdDisplay').textContent = `学号：${this.currentStudent.id}`;
-                document.getElementById('examCodeDisplay').textContent = `考号：${this.currentStudent.examCode}`;
-
-                // 显示考试界面
-                document.getElementById('examList').classList.remove('active');
-                document.getElementById('examHeader').classList.add('active');
-                document.getElementById('examContent').classList.add('active');
-
-                this.displayCurrentQuestion();
-            }
-
-            displayCurrentQuestion() {
-                const exam = this.exams.find(e => e.id === this.selectedExamId);
-                if (!exam) return;
-
-                const question = exam.questions[this.currentQuestionIndex];
-                const totalQuestions = exam.questions.length;
-
-                // 更新进度条
-                const progress = ((this.currentQuestionIndex + 1) / totalQuestions) * 100;
-                document.getElementById('progressFill').style.width = `${progress}%`;
-                document.getElementById('progressText').textContent = `${this.currentQuestionIndex + 1} / ${totalQuestions}`;
-
-                // 显示题目
-                const questionContainer = document.getElementById('questionContainer');
-                questionContainer.innerHTML = `
-                    <h3>题目 ${this.currentQuestionIndex + 1}：${question.text}</h3>
-                    <div class="exam-options">
-                        <div class="exam-option">
-                            <input type="radio" name="answer" value="通过" id="option1">
-                            <label for="option1">A：通过</label>
-                        </div>
-                        <div class="exam-option">
-                            <input type="radio" name="answer" value="自见" id="option2">
-                            <label for="option2">B：自见</label>
-                        </div>
-                        <div class="exam-option">
-                            <input type="radio" name="answer" value="限流" id="option3">
-                            <label for="option3">C：限流</label>
-                        </div>
-                        <div class="exam-option">
-                            <input type="radio" name="answer" value="下架" id="option4">
-                            <label for="option4">D：下架</label>
-                        </div>
+                        <button class="btn btn-primary" onclick="location.reload()">刷新页面</button>
                     </div>
                 `;
-
-                // 恢复已选择的答案
-                const selectedAnswer = this.studentAnswers[this.currentQuestionIndex];
-                if (selectedAnswer) {
-                    const radio = document.querySelector(`input[value="${selectedAnswer}"]`);
-                    if (radio) {
-                        radio.checked = true;
-                        radio.closest('.exam-option').classList.add('selected');
-                    }
-                }
-
-                // 绑定选项点击事件
-                document.querySelectorAll('.exam-option').forEach(option => {
-                    option.addEventListener('click', () => {
-                        const radio = option.querySelector('input[type="radio"]');
-                        radio.checked = true;
-                        
-                        // 更新选中状态
-                        document.querySelectorAll('.exam-option').forEach(opt => opt.classList.remove('selected'));
-                        option.classList.add('selected');
-                        
-                        // 保存答案
-                        this.studentAnswers[this.currentQuestionIndex] = radio.value;
-                    });
-                });
-
-                // 更新按钮状态
-                const prevBtn = document.getElementById('prevBtn');
-                const nextBtn = document.getElementById('nextBtn');
-                const submitBtn = document.getElementById('submitBtn');
-
-                prevBtn.disabled = this.currentQuestionIndex === 0;
-                
-                if (this.currentQuestionIndex === totalQuestions - 1) {
-                    nextBtn.style.display = 'none';
-                    submitBtn.style.display = 'inline-block';
-                } else {
-                    nextBtn.style.display = 'inline-block';
-                    submitBtn.style.display = 'none';
-                }
             }
 
-            nextQuestion() {
-                const exam = this.exams.find(e => e.id === this.selectedExamId);
-                if (!exam) return;
-
-                if (this.currentQuestionIndex < exam.questions.length - 1) {
-                    this.currentQuestionIndex++;
-                    this.displayCurrentQuestion();
-                }
-            }
-
-            previousQuestion() {
-                if (this.currentQuestionIndex > 0) {
-                    this.currentQuestionIndex--;
-                    this.displayCurrentQuestion();
-                }
-            }
-
-            async submitExam() {
-                if (!confirm('确定要提交试卷吗？提交后将无法修改答案。')) {
-                    return;
-                }
-
-                const exam = this.exams.find(e => e.id === this.selectedExamId);
-                if (!exam) return;
-
-                // 计算得分
-                let score = 0;
-                const answers = [];
-                
-                for (let i = 0; i < exam.questions.length; i++) {
-                    const studentAnswer = this.studentAnswers[i] || '未答';
-                    const correctAnswer = exam.questions[i].correctAnswer;
-                    answers.push(studentAnswer);
-                    
-                    if (studentAnswer === correctAnswer) {
-                        score++;
-                    }
-                }
-
-                // 创建结果记录
-                const result = {
-                    id: Date.now(),
-                    examId: this.selectedExamId,
-                    examName: exam.name,
-                    studentName: this.currentStudent.name,
-                    studentId: this.currentStudent.id,
-                    examCode: this.currentStudent.examCode,
-                    answers: answers,
-                    score: score,
-                    totalQuestions: exam.questions.length,
-                    submitTime: new Date().toISOString()
-                };
-
-                // 保存结果
-                this.results.push(result);
-                
+            async saveData() {
                 try {
                     if (this.cloudManager.isConnected) {
                         const data = {
@@ -1238,82 +515,363 @@
                             lastUpdate: new Date().toISOString()
                         };
                         await this.cloudManager.saveData(data);
-                        console.log('结果已保存到云端');
+                        console.log('云端数据保存成功');
                     } else {
-                        // 降级到本地存储
-                        localStorage.setItem('results', JSON.stringify(this.results));
-                        console.log('结果已保存到本地');
+                        this.saveExams();
+                        this.saveResults();
+                        console.log('本地数据保存成功');
                     }
                 } catch (error) {
-                    console.error('保存结果失败：', error);
-                    // 降级到本地存储
-                    localStorage.setItem('results', JSON.stringify(this.results));
+                    console.error('保存数据失败，降级到本地存储：', error);
+                    this.saveExams();
+                    this.saveResults();
+                }
+            }
+
+            // 绑定事件
+            bindEvents() {
+                // 考试选择事件
+                document.getElementById('backToExamSelectionBtn').addEventListener('click', () => this.backToExamSelection());
+                document.getElementById('verifyCodeBtn').addEventListener('click', () => this.verifyExamCode());
+                document.getElementById('backToCodeVerificationBtn').addEventListener('click', () => this.backToCodeVerification());
+                document.getElementById('startExamBtn').addEventListener('click', () => this.startExam());
+
+                // 考试控制事件
+                document.getElementById('prevBtn').addEventListener('click', () => this.previousQuestion());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextQuestion());
+                document.getElementById('submitExamBtn').addEventListener('click', () => this.submitExam());
+
+                // 结果页面事件
+                document.getElementById('retakeExamBtn').addEventListener('click', () => this.retakeExam());
+                document.getElementById('backToSelectionBtn').addEventListener('click', () => this.backToSelection());
+
+                // 考号输入框回车事件
+                document.getElementById('examCodeInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.verifyExamCode();
+                    }
+                });
+            }
+
+            // 显示可用考试
+            displayAvailableExams() {
+                const container = document.getElementById('availableExams');
+                const publishedExams = this.exams.filter(exam => exam.isPublished);
+                
+                if (publishedExams.length === 0) {
+                    container.innerHTML = '<div class="no-exams">暂无可用考试</div>';
+                    return;
                 }
 
-                // 显示结果
-                this.showResult(result);
+                container.innerHTML = publishedExams.map(exam => `
+                    <div class="exam-item" onclick="examClient.selectExamForStudent(${exam.id})">
+                        <div>
+                            <h3>${exam.name}</h3>
+                            <p>题目数量：${exam.questions.length} 道题</p>
+                            <p>考号范围：${exam.allowedCodes.join(', ')}</p>
+                        </div>
+                        <div class="exam-meta">
+                            <p>点击开始考试</p>
+                            <span class="exam-status published">已发布</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            selectExamForStudent(examId) {
+                this.selectedExamId = examId;
+                const exam = this.exams.find(e => e.id === examId);
+                if (exam) {
+                    document.getElementById('verificationExamName').textContent = exam.name;
+                    document.getElementById('studentExamName').textContent = exam.name;
+                    this.showSection('verification');
+                }
+            }
+
+            verifyExamCode() {
+                const examCode = document.getElementById('examCodeInput').value.trim();
+                if (!examCode) {
+                    this.showMessage('请输入考号！', 'error');
+                    return;
+                }
+
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (!exam) {
+                    this.showMessage('考试不存在！', 'error');
+                    return;
+                }
+
+                if (exam.allowedCodes.includes(examCode)) {
+                    this.verifiedExamCode = examCode;
+                    this.showSection('student');
+                } else {
+                    this.showMessage('考号不正确，请重新输入！', 'error');
+                }
+            }
+
+            startExam() {
+                const studentName = document.getElementById('studentName').value.trim();
+                const studentId = document.getElementById('studentId').value.trim();
+
+                if (!studentName || !studentId) {
+                    this.showMessage('请填写完整的个人信息！', 'error');
+                    return;
+                }
+
+                this.currentStudent = {
+                    name: studentName,
+                    id: studentId,
+                    examCode: this.verifiedExamCode
+                };
+
+                this.currentQuestionIndex = 0;
+                this.studentAnswers = {};
+                this.displayCurrentQuestion();
+                this.showSection('exam');
+            }
+
+            displayCurrentQuestion() {
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (!exam || !exam.questions[this.currentQuestionIndex]) {
+                    return;
+                }
+
+                const question = exam.questions[this.currentQuestionIndex];
+                const container = document.getElementById('questionContainer');
+                
+                // 计算答题进度
+                const totalQuestions = exam.questions.length;
+                const answeredQuestions = Object.keys(this.studentAnswers).length;
+                const unansweredQuestions = totalQuestions - answeredQuestions;
+                
+                container.innerHTML = `
+                    <div class="question-progress-info">
+                        <div class="progress-stats">
+                            <span class="answered-count">已答：${answeredQuestions} 题</span>
+                            <span class="unanswered-count" style="color: ${unansweredQuestions > 0 ? '#e53e3e' : '#38a169'}">未答：${unansweredQuestions} 题</span>
+                        </div>
+                    </div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="exam-options">
+                        <label class="exam-option">
+                            <input type="radio" name="answer" value="通过" ${this.studentAnswers[this.currentQuestionIndex] === '通过' ? 'checked' : ''}>
+                            <span>A：通过</span>
+                        </label>
+                        <label class="exam-option">
+                            <input type="radio" name="answer" value="自见" ${this.studentAnswers[this.currentQuestionIndex] === '自见' ? 'checked' : ''}>
+                            <span>B：自见</span>
+                        </label>
+                        <label class="exam-option">
+                            <input type="radio" name="answer" value="限流" ${this.studentAnswers[this.currentQuestionIndex] === '限流' ? 'checked' : ''}>
+                            <span>C：限流</span>
+                        </label>
+                        <label class="exam-option">
+                            <input type="radio" name="answer" value="下架" ${this.studentAnswers[this.currentQuestionIndex] === '下架' ? 'checked' : ''}>
+                            <span>D：下架</span>
+                        </label>
+                    </div>
+                `;
+
+                // 更新题目编号和进度条
+                document.getElementById('currentQuestionNum').textContent = this.currentQuestionIndex + 1;
+                const progress = ((this.currentQuestionIndex + 1) / exam.questions.length) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+
+                // 显示学生信息
+                document.getElementById('studentNameDisplay').innerHTML = `<span>${this.currentStudent.name}</span>`;
+                document.getElementById('studentIdDisplay').innerHTML = `<span>${this.currentStudent.id}</span>`;
+                document.getElementById('examCodeDisplay').innerHTML = `<span>${this.verifiedExamCode}</span>`;
+                document.getElementById('totalQuestions').textContent = exam.questions.length;
+
+                // 更新按钮状态
+                document.getElementById('prevBtn').disabled = this.currentQuestionIndex === 0;
+                document.getElementById('nextBtn').disabled = this.currentQuestionIndex === exam.questions.length - 1;
+
+                // 绑定选项变化事件
+                container.querySelectorAll('input[name="answer"]').forEach(input => {
+                    input.addEventListener('change', () => {
+                        this.studentAnswers[this.currentQuestionIndex] = input.value;
+                    });
+                });
+            }
+
+            previousQuestion() {
+                if (this.currentQuestionIndex > 0) {
+                    this.currentQuestionIndex--;
+                    this.displayCurrentQuestion();
+                }
+            }
+
+            nextQuestion() {
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (this.currentQuestionIndex < exam.questions.length - 1) {
+                    this.currentQuestionIndex++;
+                    this.displayCurrentQuestion();
+                }
+            }
+
+            async submitExam() {
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                const totalQuestions = exam.questions.length;
+                const answeredQuestions = Object.keys(this.studentAnswers).length;
+                const unansweredQuestions = totalQuestions - answeredQuestions;
+                
+                // 检查是否有未答完的题目
+                let confirmMessage = '确定要提交考试吗？提交后将无法修改答案。';
+                if (unansweredQuestions > 0) {
+                    confirmMessage += `\n\n注意：您还有 ${unansweredQuestions} 道题目没有回答，确定要提交吗？`;
+                }
+                
+                if (confirm(confirmMessage)) {
+                    let score = 0;
+                    let answeredCorrectly = 0;
+                    
+                    exam.questions.forEach((question, index) => {
+                        if (this.studentAnswers[index] === question.correctAnswer) {
+                            score++;
+                            answeredCorrectly++;
+                        }
+                    });
+
+                    const result = {
+                        examId: this.selectedExamId,
+                        studentName: this.currentStudent.name,
+                        studentId: this.currentStudent.id,
+                        examCode: this.verifiedExamCode,
+                        answers: this.studentAnswers,
+                        score: score,
+                        totalQuestions: exam.questions.length,
+                        answeredQuestions: answeredQuestions,
+                        unansweredQuestions: unansweredQuestions,
+                        submitTime: new Date().toISOString()
+                    };
+
+                    this.results.push(result);
+                    await this.saveData();
+                    this.showResult(result);
+                }
             }
 
             showResult(result) {
-                // 隐藏考试内容
-                document.getElementById('examContent').classList.remove('active');
-                document.getElementById('examHeader').classList.remove('active');
-
-                // 显示结果
-                const resultHeader = document.getElementById('resultHeader');
+                document.getElementById('resultStudentName').textContent = result.studentName;
+                document.getElementById('resultStudentId').textContent = result.studentId;
+                document.getElementById('resultExamCode').textContent = result.examCode;
+                document.getElementById('resultTime').textContent = new Date(result.submitTime).toLocaleString();
+                const percentage = Math.round((result.score / result.totalQuestions) * 100);
+                document.getElementById('scoreDisplay').textContent = `${result.score} / ${result.totalQuestions} (${percentage}%)`;
+                
+                // 更新结果图标和标题
                 const resultIcon = document.getElementById('resultIcon');
-                const resultIconSymbol = document.getElementById('resultIconSymbol');
                 const resultTitle = document.getElementById('resultTitle');
-                const scoreDisplay = document.getElementById('scoreDisplay');
-
-                // 计算百分比
-                const percentage = (result.score / result.totalQuestions) * 100;
-
-                // 设置图标和标题
-                if (percentage >= 80) {
-                    resultIcon.className = 'icon-circle excellent';
-                    resultIconSymbol.textContent = '🎉';
-                    resultTitle.textContent = '优秀！';
+                
+                // 检查是否有未答完的题目
+                const unansweredQuestions = result.unansweredQuestions || 0;
+                
+                if (unansweredQuestions > 0) {
+                    resultIcon.textContent = '⚠️';
+                    resultTitle.textContent = '考试完成 - 有题目未答完';
+                } else if (percentage >= 80) {
+                    resultIcon.textContent = '🎉';
+                    resultTitle.textContent = '考试完成 - 优秀！';
                 } else if (percentage >= 60) {
-                    resultIcon.className = 'icon-circle good';
-                    resultIconSymbol.textContent = '👍';
-                    resultTitle.textContent = '良好！';
+                    resultIcon.textContent = '👍';
+                    resultTitle.textContent = '考试完成 - 良好！';
                 } else {
-                    resultIcon.className = 'icon-circle poor';
-                    resultIconSymbol.textContent = '💪';
-                    resultTitle.textContent = '继续努力！';
+                    resultIcon.textContent = '📚';
+                    resultTitle.textContent = '考试完成 - 继续努力！';
                 }
-
-                // 显示分数
-                scoreDisplay.textContent = `得分：${result.score} / ${result.totalQuestions}`;
-
-                resultHeader.classList.add('active');
+                
+                // 添加未答完题目的详细信息
+                this.updateResultDetails(result);
+                
+                this.showSection('result');
             }
 
-            restartExam() {
-                // 重置状态
+            updateResultDetails(result) {
+                const resultDetails = document.querySelector('.result-details');
+                const unansweredQuestions = result.unansweredQuestions || 0;
+                const answeredQuestions = result.answeredQuestions || result.totalQuestions;
+                const percentage = Math.round((result.score / result.totalQuestions) * 100);
+                
+                // 创建详细信息HTML
+                let detailsHTML = `
+                    <p>姓名：<span id="resultStudentName">${result.studentName}</span></p>
+                    <p>学号：<span id="resultStudentId">${result.studentId}</span></p>
+                    <p>考号：<span id="resultExamCode">${result.examCode}</span></p>
+                    <p>完成时间：<span id="resultTime">${new Date(result.submitTime).toLocaleString()}</span></p>
+                    <p>得分：<span style="color: #2d3748; font-weight: bold; font-size: 1.1em;">${result.score}/${result.totalQuestions} (${percentage}%)</span></p>
+                    <p>答题情况：<span style="color: ${unansweredQuestions > 0 ? '#e53e3e' : '#38a169'}">${answeredQuestions}/${result.totalQuestions} 题</span></p>
+                `;
+                
+                if (unansweredQuestions > 0) {
+                    detailsHTML += `<p style="color: #e53e3e; font-weight: bold;">⚠️ 还有 ${unansweredQuestions} 道题目未回答</p>`;
+                }
+                
+                resultDetails.innerHTML = detailsHTML;
+            }
+
+            retakeExam() {
                 this.currentQuestionIndex = 0;
                 this.studentAnswers = {};
+                this.displayCurrentQuestion();
+                this.showSection('exam');
+            }
+
+            backToExamSelection() {
                 this.selectedExamId = null;
-                this.currentStep = 1;
+                this.verifiedExamCode = null;
+                this.currentStudent = null;
+                this.showSection('welcome');
+            }
 
-                // 隐藏所有面板
-                document.getElementById('resultHeader').classList.remove('active');
-                document.getElementById('examHeader').classList.remove('active');
-                document.getElementById('examContent').classList.remove('active');
-                document.getElementById('examList').classList.remove('active');
+            backToCodeVerification() {
+                this.showSection('verification');
+            }
 
-                // 显示欢迎区域
-                document.getElementById('welcomeSection').style.display = 'block';
-                document.getElementById('verificationForm').style.display = 'block';
-                document.getElementById('studentForm').style.display = 'none';
+            backToSelection() {
+                this.backToExamSelection();
+            }
 
-                // 清空表单
-                document.getElementById('examCode').value = '';
-                document.getElementById('studentName').value = '';
-                document.getElementById('studentId').value = '';
+            showSection(sectionName) {
+                const sections = ['welcome', 'verification', 'student', 'exam', 'result'];
+                sections.forEach(section => {
+                    const element = document.getElementById(section + 'Section');
+                    if (element) {
+                        element.style.display = section === sectionName ? 'block' : 'none';
+                    }
+                });
+            }
 
-                this.updateStepIndicator();
+            showMessage(message, type = 'info') {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = message;
+                document.body.appendChild(messageDiv);
+
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 3000);
+            }
+
+            // 本地存储方法（降级使用）
+            loadExams() {
+                const data = localStorage.getItem('exams');
+                return data ? JSON.parse(data) : [];
+            }
+
+            saveExams() {
+                localStorage.setItem('exams', JSON.stringify(this.exams));
+            }
+
+            loadResults() {
+                const data = localStorage.getItem('results');
+                return data ? JSON.parse(data) : [];
+            }
+
+            saveResults() {
+                localStorage.setItem('results', JSON.stringify(this.results));
             }
         }
 
