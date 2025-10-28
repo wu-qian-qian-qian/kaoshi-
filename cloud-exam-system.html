@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云端考试系统 v1.8</title>
+    <!-- 内联样式，避免外部文件冲突 -->
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-weight: 600;
+        }
+
+        .version {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.6em;
+            font-weight: 500;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            color: #4a5568;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .panel {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .panel-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .panel-header h2 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        .panel-header p {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        /* 云端配置样式 */
+        .cloud-config {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .config-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-section h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .config-steps {
+            margin: 20px 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content p {
+            margin: 5px 0;
+            color: #4a5568;
+        }
+
+        .step-content a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .step-content a:hover {
+            text-decoration: underline;
+        }
+
+        .step-content code {
+            background: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #2d3748;
+            font-size: 0.9em;
+        }
+
+        .config-form {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+            transform: translateY(-2px);
+        }
+
+        .config-status {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-icon {
+            font-size: 20px;
+        }
+
+        .status-text {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .cloud-indicator {
+            background: #e6fffa;
+            color: #234e52;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 消息提示样式 */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #48bb78;
+        }
+
+        .message.error {
+            background: #f56565;
+        }
+
+        .message.info {
+            background: #4299e1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* 考试管理样式 */
+        .exam-management, .question-management {
+            margin-bottom: 30px;
+        }
+
+        .exam-form {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .exam-list {
+            margin-top: 20px;
+        }
+
+        .exam-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exam-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .exam-item.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .exam-item h4 {
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .exam-item p {
+            margin: 5px 0;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .current-exam-info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .exam-actions {
+            margin-top: 15px;
+        }
+
+        .exam-actions .btn {
+            margin-right: 10px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #dd6b20;
+        }
+
+        .excel-import {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .import-info {
+            margin-bottom: 15px;
+        }
+
+        .import-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .import-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .question-form {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .fixed-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-item {
+            background: #e2e8f0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .questions-list {
+            margin-top: 20px;
+        }
+
+        .question-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .question-content {
+            margin-bottom: 10px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .question-answer {
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        .results-list {
+            margin-top: 15px;
+        }
+
+        .result-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .result-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .result-info span {
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+
+        .result-time {
+            color: #718096;
+            font-size: 0.8em;
+        }
+
+        /* 分析模态框样式 */
+        .analysis-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .analysis-actions {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .analysis-table-container {
+            overflow-x: auto;
+        }
+
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .analysis-table th,
+        .analysis-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .analysis-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #2d3748;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .question-cell {
+            max-width: 300px;
+            word-wrap: break-word;
+            font-weight: 500;
+        }
+
+        .correct-answer {
+            background: #c6f6d5;
+            color: #22543d;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .student-answer {
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .student-answer.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .student-answer.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #3182ce;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-btn {
+                width: 200px;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .config-section {
+                padding: 20px;
+            }
+
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .step-number {
+                margin: 0 auto 10px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .fixed-options {
+                grid-template-columns: 1fr;
+            }
+
+            .result-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .exam-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .exam-actions .btn {
+                margin-right: 0;
+            }
+        }
+    </style>
+    <!-- SheetJS库用于Excel文件解析 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>云端考试系统 <span class="version">v1.8</span></h1>
+            <nav>
+                <button id="cloudConfigBtn" class="nav-btn active">云端配置</button>
+                <button id="adminBtn" class="nav-btn">管理后台</button>
+                <button id="studentBtn" class="nav-btn">学生考试</button>
+                <button id="resultsBtn" class="nav-btn">查看结果</button>
+            </nav>
+        </header>
+
+        <!-- 云端配置面板 -->
+        <div id="cloudConfigPanel" class="panel active">
+            <div class="panel-header">
+                <h2>云端配置</h2>
+                <p>配置云端存储，实现数据同步</p>
+            </div>
+
+            <div class="cloud-config">
+                <div class="config-section">
+                    <h3>📋 配置步骤</h3>
+                    <div class="config-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <p>访问 <a href="https://jsonbin.io/" target="_blank">JSONBin.io</a> 注册账号</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <p>创建新的Bin，内容：<code>{"exams":[],"results":[]}</code></p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <p>复制Bin URL和Secret Key到下方表单</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <p>点击"测试连接"确认配置成功</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>⚙️ 配置信息</h3>
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label for="binUrl">Bin URL：</label>
+                            <input type="text" id="binUrl" placeholder="https://api.jsonbin.io/v3/b/您的bin-id">
+                        </div>
+                        <div class="form-group">
+                            <label for="secretKey">Secret Key：</label>
+                            <input type="text" id="secretKey" placeholder="您的Secret Key">
+                        </div>
+                        <div class="form-actions">
+                            <button id="testConnectionBtn" class="btn btn-secondary">测试连接</button>
+                            <button id="saveConfigBtn" class="btn btn-primary">保存配置</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-status">
+                    <div class="status-indicator">
+                        <span class="status-icon" id="connectionStatus">🔴</span>
+                        <span class="status-text" id="statusText">未连接</span>
+                    </div>
+                    <div class="cloud-indicator" id="cloudStatus">💾 本地模式</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理后台面板 -->
+        <div id="adminPanel" class="panel">
+            <div class="panel-header">
+                <h2>管理后台</h2>
+                <div class="cloud-indicator">
+                    <span id="cloudStatus">🌐 云端模式</span>
+                </div>
+            </div>
+
+            <!-- 考试管理 -->
+            <div class="exam-management">
+                <h3>考试管理</h3>
+                <div class="exam-form">
+                    <div class="form-group">
+                        <label for="examName">考试名称：</label>
+                        <input type="text" id="examName" placeholder="例如：10月第一次考试">
+                    </div>
+                    <div class="form-group">
+                        <label for="examCodes">允许的考号（每行一个）：</label>
+                        <textarea id="examCodes" placeholder="001&#10;002&#10;003"></textarea>
+                    </div>
+                    <button id="createExamBtn" class="btn btn-primary">创建新考试</button>
+                </div>
+
+                <div class="exam-list">
+                    <h4>现有考试</h4>
+                    <div id="examsList">
+                        <!-- 考试列表将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 题目管理 -->
+            <div class="question-management">
+                <h3>题目管理</h3>
+                <div class="current-exam-info">
+                    <div id="currentExamInfo">
+                        <p>请先选择一个考试</p>
+                    </div>
+                    <div class="exam-actions">
+                        <button id="publishExamBtn" class="btn btn-success" disabled>发布考试</button>
+                        <button id="unpublishExamBtn" class="btn btn-warning" disabled>取消发布</button>
+                        <button id="deleteExamBtn" class="btn btn-danger" disabled>删除考试</button>
+                    </div>
+                </div>
+
+                <!-- Excel导入功能 -->
+                <div class="excel-import">
+                    <h3>Excel批量导入</h3>
+                    <div class="import-controls">
+                        <div class="import-info">
+                            <p><strong>Excel格式要求：</strong></p>
+                            <ul>
+                                <li>第一列：序号</li>
+                                <li>第二列：题目内容</li>
+                                <li>第三列：正确答案（通过/自见/限流/下架）</li>
+                            </ul>
+                            <p><strong>固定选项：</strong>A：通过；B：自见；C：限流；D：下架</p>
+                        </div>
+                        <div class="import-actions">
+                            <button id="downloadTemplateBtn" class="btn btn-secondary">下载Excel模板</button>
+                            <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;">
+                            <button id="importExcelBtn" class="btn btn-primary">选择Excel文件导入</button>
+                        </div>
+                    </div>
+                    <div id="importResult" class="import-result" style="display: none;"></div>
+                </div>
+
+                <!-- 手动添加题目 -->
+                <div class="question-form">
+                    <h3>手动添加题目</h3>
+                    <form id="questionForm">
+                        <div class="form-group">
+                            <label for="questionText">题目内容：</label>
+                            <textarea id="questionText" placeholder="请输入题目内容" required></textarea>
+                        </div>
+                        <div class="fixed-options">
+                            <div class="option-item">A：通过</div>
+                            <div class="option-item">B：自见</div>
+                            <div class="option-item">C：限流</div>
+                            <div class="option-item">D：下架</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="correctAnswer">正确答案：</label>
+                            <select id="correctAnswer" name="correctAnswer" required>
+                                <option value="">请选择正确答案</option>
+                                <option value="通过">通过</option>
+                                <option value="自见">自见</option>
+                                <option value="限流">限流</option>
+                                <option value="下架">下架</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">添加题目</button>
+                    </form>
+                </div>
+
+                <div class="questions-list">
+                    <h3>题目列表</h3>
+                    <div id="questionsList">
+                        <!-- 题目列表将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学生考试面板 -->
+        <div id="studentPanel" class="panel">
+            <div class="panel-header">
+                <h2>学生考试</h2>
+                <p>学生端链接：<a href="cloud-exam.html" target="_blank">cloud-exam.html</a></p>
+            </div>
+            <div style="text-align: center; padding: 50px;">
+                <h3>学生考试入口</h3>
+                <p>学生可以通过以下链接参加考试：</p>
+                <div style="background: #f8fafc; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <code id="studentLink">https://您的用户名.github.io/您的仓库名/cloud-exam.html</code>
+                </div>
+                <p>请将此链接分享给学生使用</p>
+            </div>
+        </div>
+
+        <!-- 查看结果面板 -->
+        <div id="resultsPanel" class="panel">
+            <div class="panel-header">
+                <h2>查看结果</h2>
+                <div class="panel-actions">
+                    <button id="refreshResultsBtn" class="btn btn-secondary">刷新结果</button>
+                    <button id="clearResultsBtn" class="btn btn-danger">清空结果</button>
+                </div>
+            </div>
+            <div id="resultsList">
+                <!-- 结果列表将在这里显示 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 云端数据管理器
+        class CloudDataManager {
+            constructor() {
+                this.binUrl = null;
+                this.secretKey = null;
+                this.isConnected = false;
+            }
+
+            setConfig(binUrl, secretKey) {
+                this.binUrl = binUrl;
+                this.secretKey = secretKey;
+                this.isConnected = !!binUrl && !!secretKey;
+                this.saveConfig();
+            }
+
+            saveConfig() {
+                localStorage.setItem('cloudConfig', JSON.stringify({
+                    binUrl: this.binUrl,
+                    secretKey: this.secretKey
+                }));
+            }
+
+            loadConfig() {
+                const config = localStorage.getItem('cloudConfig');
+                if (config) {
+                    try {
+                        const parsed = JSON.parse(config);
+                        this.binUrl = parsed.binUrl;
+                        this.secretKey = parsed.secretKey;
+                        this.isConnected = !!this.binUrl && !!this.secretKey;
+                    } catch (error) {
+                        console.error('配置解析失败：', error);
+                        this.binUrl = null;
+                        this.secretKey = null;
+                        this.isConnected = false;
+                    }
+                }
+            }
+
+            async getData() {
+                if (!this.isConnected) {
+                    throw new Error('未配置云端存储');
+                }
+
+                try {
+                    const response = await fetch(this.binUrl, {
+                        headers: {
+                            'X-Master-Key': this.secretKey
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    return data.record || { exams: [], results: [] };
+                } catch (error) {
+                    console.error('获取云端数据失败：', error);
+                    throw error;
+                }
+            }
+
+            async saveData(data) {
+                if (!this.isConnected) {
+                    throw new Error('未配置云端存储');
+                }
+
+                try {
+                    const response = await fetch(this.binUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': this.secretKey
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.error('保存云端数据失败：', error);
+                    throw error;
+                }
+            }
+
+            async testConnection() {
+                console.log('测试连接 - binUrl:', this.binUrl);
+                console.log('测试连接 - secretKey:', this.secretKey ? '已设置' : '未设置');
+                console.log('测试连接 - isConnected:', this.isConnected);
+                
+                if (!this.binUrl || !this.secretKey) {
+                    throw new Error('请先设置Bin URL和Secret Key');
+                }
+                
+                try {
+                    await this.getData();
+                    this.isConnected = true;
+                    console.log('连接测试成功');
+                    return true;
+                } catch (error) {
+                    this.isConnected = false;
+                    console.error('连接测试失败：', error);
+                    throw error;
+                }
+            }
+        }
+
+        // 云端考试系统
+        class CloudExamSystem {
+            constructor() {
+                this.version = '1.8.0';
+                this.cloudManager = new CloudDataManager();
+                this.exams = [];
+                this.results = [];
+                this.currentQuestionIndex = 0;
+                this.studentAnswers = {};
+                this.currentStudent = null;
+                this.selectedExamId = null;
+                this.verifiedExamCode = null;
+
+                this.init();
+            }
+
+            async init() {
+                this.cloudManager.loadConfig();
+                this.bindEvents();
+                await this.loadData();
+                this.displayExams();
+                this.displayResults();
+                this.updateCloudStatus();
+            }
+
+            async loadData() {
+                try {
+                    if (this.cloudManager.isConnected) {
+                        const data = await this.cloudManager.getData();
+                        this.exams = data.exams || [];
+                        this.results = data.results || [];
+                        console.log('云端数据加载成功');
+                    } else {
+                        // 降级到本地存储
+                        this.exams = this.loadExams();
+                        this.results = this.loadResults();
+                        console.log('使用本地数据');
+                    }
+                } catch (error) {
+                    console.error('加载数据失败，使用本地数据：', error);
+                    this.exams = this.loadExams();
+                    this.results = this.loadResults();
+                }
+            }
+
+            async saveData() {
+                try {
+                    if (this.cloudManager.isConnected) {
+                        const data = {
+                            exams: this.exams,
+                            results: this.results,
+                            version: this.version,
+                            lastUpdate: new Date().toISOString()
+                        };
+                        await this.cloudManager.saveData(data);
+                        console.log('云端数据保存成功');
+                    } else {
+                        // 降级到本地存储
+                        this.saveExams();
+                        this.saveResults();
+                        console.log('本地数据保存成功');
+                    }
+                } catch (error) {
+                    console.error('保存数据失败，降级到本地存储：', error);
+                    this.saveExams();
+                    this.saveResults();
+                }
+            }
+
+            bindEvents() {
+                // 导航
+                document.getElementById('cloudConfigBtn').addEventListener('click', () => this.showPanel('cloudConfig'));
+                document.getElementById('adminBtn').addEventListener('click', () => this.showPanel('admin'));
+                document.getElementById('studentBtn').addEventListener('click', () => this.showPanel('student'));
+                document.getElementById('resultsBtn').addEventListener('click', () => this.showPanel('results'));
+
+                // 云端配置
+                document.getElementById('testConnectionBtn').addEventListener('click', () => this.testConnection());
+                document.getElementById('saveConfigBtn').addEventListener('click', () => this.saveConfig());
+
+                // 考试管理
+                document.getElementById('createExamBtn').addEventListener('click', () => this.createExam());
+                document.getElementById('deleteExamBtn').addEventListener('click', () => this.deleteExam());
+                document.getElementById('publishExamBtn').addEventListener('click', () => this.publishExam());
+                document.getElementById('unpublishExamBtn').addEventListener('click', () => this.unpublishExam());
+
+                // 题目管理
+                document.getElementById('questionForm').addEventListener('submit', (e) => this.addQuestion(e));
+                document.getElementById('downloadTemplateBtn').addEventListener('click', () => this.downloadTemplate());
+                document.getElementById('importExcelBtn').addEventListener('click', () => this.triggerFileInput());
+                document.getElementById('excelFileInput').addEventListener('change', (e) => this.importExcel(e));
+
+                // 结果管理
+                document.getElementById('refreshResultsBtn').addEventListener('click', () => this.displayResults());
+                document.getElementById('clearResultsBtn').addEventListener('click', () => this.clearResults());
+            }
+
+            // 云端配置相关
+            async testConnection() {
+                const binUrl = document.getElementById('binUrl').value.trim();
+                const secretKey = document.getElementById('secretKey').value.trim();
+
+                if (!binUrl || !secretKey) {
+                    this.showMessage('请填写完整的配置信息！', 'error');
+                    return;
+                }
+
+                // 显示测试中状态
+                this.showMessage('正在测试连接...', 'info');
+                
+                this.cloudManager.setConfig(binUrl, secretKey);
+
+                try {
+                    await this.cloudManager.testConnection();
+                    this.showMessage('连接成功！云端存储已配置', 'success');
+                    this.updateCloudStatus();
+                    await this.loadData();
+                } catch (error) {
+                    console.error('连接测试详细错误：', error);
+                    this.showMessage('连接失败：' + error.message, 'error');
+                    this.updateCloudStatus();
+                }
+            }
+
+            saveConfig() {
+                const binUrl = document.getElementById('binUrl').value.trim();
+                const secretKey = document.getElementById('secretKey').value.trim();
+
+                if (!binUrl || !secretKey) {
+                    this.showMessage('请填写完整的配置信息！', 'error');
+                    return;
+                }
+
+                this.cloudManager.setConfig(binUrl, secretKey);
+                this.showMessage('配置已保存！', 'success');
+                this.updateCloudStatus();
+            }
+
+            updateCloudStatus() {
+                const statusElement = document.getElementById('connectionStatus');
+                const cloudStatusElement = document.getElementById('cloudStatus');
+                
+                if (this.cloudManager.isConnected) {
+                    statusElement.innerHTML = '<span class="status-icon">🟢</span><span class="status-text">已连接</span>';
+                    cloudStatusElement.textContent = '🌐 云端模式';
+                } else {
+                    statusElement.innerHTML = '<span class="status-icon">🔴</span><span class="status-text">未连接</span>';
+                    cloudStatusElement.textContent = '💾 本地模式';
+                }
+            }
+
+            // 考试管理方法
+            createExam() {
+                const examName = document.getElementById('examName').value.trim();
+                const examCodesText = document.getElementById('examCodes').value.trim();
+
+                if (!examName) {
+                    this.showMessage('请输入考试名称！', 'error');
+                    return;
+                }
+
+                if (!examCodesText) {
+                    this.showMessage('请输入允许的考号！', 'error');
+                    return;
+                }
+
+                const allowedCodes = examCodesText.split('\n').map(code => code.trim()).filter(code => code);
+                
+                if (allowedCodes.length === 0) {
+                    this.showMessage('请输入有效的考号！', 'error');
+                    return;
+                }
+
+                const newExam = {
+                    id: Date.now(),
+                    name: examName,
+                    questions: [],
+                    allowedCodes: allowedCodes,
+                    isPublished: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                this.exams.push(newExam);
+                this.saveData();
+                this.displayExams();
+                this.showMessage('考试创建成功！', 'success');
+
+                // 清空表单
+                document.getElementById('examName').value = '';
+                document.getElementById('examCodes').value = '';
+            }
+
+            deleteExam() {
+                if (!this.selectedExamId) {
+                    this.showMessage('请先选择一个考试！', 'error');
+                    return;
+                }
+
+                if (confirm('确定要删除这个考试吗？此操作不可恢复！')) {
+                    this.exams = this.exams.filter(exam => exam.id !== this.selectedExamId);
+                    this.saveData();
+                    this.displayExams();
+                    this.updateCurrentExamInfo();
+                    this.showMessage('考试删除成功！', 'success');
+                }
+            }
+
+            publishExam() {
+                if (!this.selectedExamId) {
+                    this.showMessage('请先选择一个考试！', 'error');
+                    return;
+                }
+
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (exam) {
+                    exam.isPublished = true;
+                    this.saveData();
+                    this.displayExams();
+                    this.updateCurrentExamInfo();
+                    this.showMessage('考试发布成功！', 'success');
+                }
+            }
+
+            unpublishExam() {
+                if (!this.selectedExamId) {
+                    this.showMessage('请先选择一个考试！', 'error');
+                    return;
+                }
+
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (exam) {
+                    exam.isPublished = false;
+                    this.saveData();
+                    this.displayExams();
+                    this.updateCurrentExamInfo();
+                    this.showMessage('考试已取消发布！', 'success');
+                }
+            }
+
+            selectExam(examId) {
+                this.selectedExamId = examId;
+                this.updateCurrentExamInfo();
+                this.displayQuestions();
+            }
+
+            updateCurrentExamInfo() {
+                const infoElement = document.getElementById('currentExamInfo');
+                const publishBtn = document.getElementById('publishExamBtn');
+                const unpublishBtn = document.getElementById('unpublishExamBtn');
+                const deleteBtn = document.getElementById('deleteExamBtn');
+
+                if (!this.selectedExamId) {
+                    infoElement.innerHTML = '<p>请先选择一个考试</p>';
+                    publishBtn.disabled = true;
+                    unpublishBtn.disabled = true;
+                    deleteBtn.disabled = true;
+                    return;
+                }
+
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (exam) {
+                    infoElement.innerHTML = `
+                        <h4>${exam.name}</h4>
+                        <p>题目数量：${exam.questions.length} 道</p>
+                        <p>考号范围：${exam.allowedCodes.join(', ')}</p>
+                        <p>状态：${exam.isPublished ? '已发布' : '未发布'}</p>
+                    `;
+                    publishBtn.disabled = exam.isPublished;
+                    unpublishBtn.disabled = !exam.isPublished;
+                    deleteBtn.disabled = false;
+                }
+            }
+
+            displayExams() {
+                const container = document.getElementById('examsList');
+                if (this.exams.length === 0) {
+                    container.innerHTML = '<p>暂无考试</p>';
+                    return;
+                }
+
+                container.innerHTML = this.exams.map(exam => `
+                    <div class="exam-item ${this.selectedExamId === exam.id ? 'selected' : ''}" 
+                         onclick="examSystem.selectExam(${exam.id})">
+                        <h4>${exam.name}</h4>
+                        <p>题目：${exam.questions.length} 道</p>
+                        <p>考号：${exam.allowedCodes.join(', ')}</p>
+                        <p>状态：${exam.isPublished ? '已发布' : '未发布'}</p>
+                    </div>
+                `).join('');
+            }
+
+            displayQuestions() {
+                const container = document.getElementById('questionsList');
+                if (!this.selectedExamId) {
+                    container.innerHTML = '<p>请先选择一个考试</p>';
+                    return;
+                }
+
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (!exam || exam.questions.length === 0) {
+                    container.innerHTML = '<p>暂无题目</p>';
+                    return;
+                }
+
+                container.innerHTML = exam.questions.map((question, index) => `
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-number">题目 ${index + 1}</span>
+                            <button class="btn btn-danger btn-sm" onclick="examSystem.deleteQuestion(${index})">删除</button>
+                        </div>
+                        <div class="question-content">${question.text}</div>
+                        <div class="question-answer">正确答案：${question.correctAnswer}</div>
+                    </div>
+                `).join('');
+            }
+
+            deleteQuestion(questionIndex) {
+                if (!this.selectedExamId) return;
+
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (exam && confirm('确定要删除这道题目吗？')) {
+                    exam.questions.splice(questionIndex, 1);
+                    this.saveData();
+                    this.displayQuestions();
+                    this.updateCurrentExamInfo();
+                    this.showMessage('题目删除成功！', 'success');
+                }
+            }
+
+            // 题目管理方法
+            addQuestion(event) {
+                event.preventDefault();
+                
+                if (!this.selectedExamId) {
+                    this.showMessage('请先选择一个考试！', 'error');
+                    return;
+                }
+
+                const questionText = document.getElementById('questionText').value.trim();
+                const correctAnswer = document.getElementById('correctAnswer').value;
+
+                if (!questionText || !correctAnswer) {
+                    this.showMessage('请填写完整的题目信息！', 'error');
+                    return;
+                }
+
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (exam) {
+                    exam.questions.push({
+                        text: questionText,
+                        correctAnswer: correctAnswer
+                    });
+                    this.saveData();
+                    this.displayQuestions();
+                    this.updateCurrentExamInfo();
+                    this.showMessage('题目添加成功！', 'success');
+
+                    // 清空表单
+                    document.getElementById('questionText').value = '';
+                    document.getElementById('correctAnswer').value = '';
+                }
+            }
+
+            downloadTemplate() {
+                try {
+                    console.log('开始生成Excel模板...');
+                    const data = [
+                        ['序号', '题目', '答案'],
+                        ['1', '示例题目1：这是一个示例题目，请选择正确答案', '通过'],
+                        ['2', '示例题目2：这是另一个示例题目，请选择正确答案', '自见'],
+                        ['3', '示例题目3：这是第三个示例题目，请选择正确答案', '限流'],
+                        ['4', '示例题目4：这是第四个示例题目，请选择正确答案', '下架']
+                    ];
+
+                    console.log('模板数据：', data);
+
+                    const ws = XLSX.utils.aoa_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, '题目模板');
+
+                    console.log('开始下载文件...');
+                    XLSX.writeFile(wb, '题目模板.xlsx');
+                    this.showMessage('模板下载成功！', 'success');
+                } catch (error) {
+                    console.error('下载模板失败：', error);
+                    this.showMessage('下载模板失败：' + error.message, 'error');
+                }
+            }
+
+            triggerFileInput() {
+                document.getElementById('excelFileInput').click();
+            }
+
+            importExcel(event) {
+                console.log('开始导入Excel文件...');
+                const file = event.target.files[0];
+                if (!file) {
+                    console.log('没有选择文件');
+                    return;
+                }
+
+                console.log('选择的文件：', file.name, file.type);
+
+                if (!this.selectedExamId) {
+                    console.log('没有选择考试');
+                    this.showMessage('请先选择一个考试！', 'error');
+                    return;
+                }
+
+                console.log('选择的考试ID：', this.selectedExamId);
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        console.log('开始解析Excel文件...');
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        console.log('Excel工作表：', workbook.SheetNames);
+                        
+                        const sheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                        console.log('解析的数据：', jsonData);
+
+                        if (jsonData.length < 2) {
+                            throw new Error('Excel文件格式不正确，至少需要2行数据（标题行+数据行）');
+                        }
+
+                        const exam = this.exams.find(e => e.id === this.selectedExamId);
+                        if (!exam) {
+                            this.showMessage('考试不存在！', 'error');
+                            return;
+                        }
+
+                        console.log('找到考试：', exam.name);
+
+                        let importedCount = 0;
+                        for (let i = 1; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            console.log(`处理第${i+1}行：`, row);
+                            
+                            if (row.length >= 3 && row[1] && row[2]) {
+                                const questionText = row[1].toString().trim();
+                                const answer = row[2].toString().trim();
+                                console.log(`题目：${questionText}, 答案：${answer}`);
+
+                                if (questionText && ['通过', '自见', '限流', '下架'].includes(answer)) {
+                                    exam.questions.push({
+                                        text: questionText,
+                                        correctAnswer: answer
+                                    });
+                                    importedCount++;
+                                    console.log(`成功添加题目 ${importedCount}`);
+                                } else {
+                                    console.log('题目或答案格式不正确，跳过');
+                                }
+                            } else {
+                                console.log('行数据不完整，跳过');
+                            }
+                        }
+
+                        console.log(`总共导入 ${importedCount} 道题目`);
+
+                        if (importedCount > 0) {
+                            this.saveData();
+                            this.displayQuestions();
+                            this.updateCurrentExamInfo();
+                            this.showMessage(`成功导入 ${importedCount} 道题目！`, 'success');
+                        } else {
+                            this.showMessage('没有找到有效的题目数据！请检查Excel格式是否正确。', 'error');
+                        }
+
+                    } catch (error) {
+                        console.error('导入Excel失败：', error);
+                        this.showMessage('导入失败：' + error.message, 'error');
+                    }
+                };
+                
+                reader.onerror = (error) => {
+                    console.error('文件读取失败：', error);
+                    this.showMessage('文件读取失败！', 'error');
+                };
+                
+                reader.readAsArrayBuffer(file);
+
+                // 清空文件输入
+                event.target.value = '';
+            }
+
+            // 结果管理方法
+            displayResults() {
+                const container = document.getElementById('resultsList');
+                if (this.results.length === 0) {
+                    container.innerHTML = '<p>暂无考试结果</p>';
+                    return;
+                }
+
+                // 按考试分组显示结果
+                const resultsByExam = {};
+                this.results.forEach(result => {
+                    const exam = this.exams.find(e => e.id === result.examId);
+                    const examName = exam ? exam.name : '未知考试';
+                    if (!resultsByExam[examName]) {
+                        resultsByExam[examName] = [];
+                    }
+                    resultsByExam[examName].push(result);
+                });
+
+                container.innerHTML = Object.keys(resultsByExam).map(examName => `
+                    <div class="exam-results">
+                        <div class="exam-header">
+                            <h4>${examName}</h4>
+                            <button class="btn btn-info btn-sm" onclick="examSystem.showDetailedAnalysis('${examName}')">详细分析</button>
+                        </div>
+                        <div class="results-list">
+                            ${resultsByExam[examName].map(result => `
+                                <div class="result-item">
+                                    <div class="result-info">
+                                        <span class="student-name">${result.studentName}</span>
+                                        <span class="student-id">学号：${result.studentId}</span>
+                                        <span class="exam-code">考号：${result.examCode}</span>
+                                        <span class="score">得分：${result.score}/${result.totalQuestions}</span>
+                                    </div>
+                                    <div class="result-time">${new Date(result.submitTime).toLocaleString()}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 详细分析功能
+            showDetailedAnalysis(examName) {
+                const exam = this.exams.find(e => e.name === examName);
+                if (!exam) {
+                    this.showMessage('考试不存在！', 'error');
+                    return;
+                }
+
+                const examResults = this.results.filter(result => result.examId === exam.id);
+                if (examResults.length === 0) {
+                    this.showMessage('该考试暂无结果！', 'error');
+                    return;
+                }
+
+                // 创建分析弹窗
+                this.createAnalysisModal(exam, examResults);
+            }
+
+            createAnalysisModal(exam, results) {
+                // 创建模态框
+                const modal = document.createElement('div');
+                modal.className = 'analysis-modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>${exam.name} - 详细分析</h3>
+                            <button class="close-btn" onclick="this.closest('.analysis-modal').remove()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="analysis-actions">
+                                <button class="btn btn-primary" onclick="examSystem.exportAnalysisData('${exam.name}')">导出数据</button>
+                            </div>
+                            <div class="analysis-table-container">
+                                <table class="analysis-table">
+                                    <thead>
+                                        <tr>
+                                            <th>题目</th>
+                                            <th>正确答案</th>
+                                            ${results.map(result => `<th>${result.studentName}</th>`).join('')}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${exam.questions.map((question, index) => `
+                                            <tr>
+                                                <td class="question-cell">题目${index + 1}：${question.text}</td>
+                                                <td class="correct-answer">${question.correctAnswer}</td>
+                                                ${results.map(result => {
+                                                    const studentAnswer = result.answers[index] || '未答';
+                                                    const isCorrect = studentAnswer === question.correctAnswer;
+                                                    return `<td class="student-answer ${isCorrect ? 'correct' : 'incorrect'}">${studentAnswer}</td>`;
+                                                }).join('')}
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+            }
+
+            // 导出分析数据
+            exportAnalysisData(examName) {
+                const exam = this.exams.find(e => e.name === examName);
+                if (!exam) {
+                    this.showMessage('考试不存在！', 'error');
+                    return;
+                }
+
+                const examResults = this.results.filter(result => result.examId === exam.id);
+                if (examResults.length === 0) {
+                    this.showMessage('该考试暂无结果！', 'error');
+                    return;
+                }
+
+                try {
+                    // 准备导出数据
+                    const exportData = [
+                        ['题目', '正确答案', ...examResults.map(result => result.studentName)]
+                    ];
+
+                    exam.questions.forEach((question, index) => {
+                        const row = [
+                            `题目${index + 1}：${question.text}`,
+                            question.correctAnswer,
+                            ...examResults.map(result => {
+                                const studentAnswer = result.answers[index] || '未答';
+                                return studentAnswer;
+                            })
+                        ];
+                        exportData.push(row);
+                    });
+
+                    // 使用SheetJS导出
+                    const ws = XLSX.utils.aoa_to_sheet(exportData);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, '题目分析');
+
+                    XLSX.writeFile(wb, `${examName}_题目分析.xlsx`);
+                    this.showMessage('数据导出成功！', 'success');
+                } catch (error) {
+                    console.error('导出失败：', error);
+                    this.showMessage('导出失败：' + error.message, 'error');
+                }
+            }
+
+            clearResults() {
+                if (confirm('确定要清空所有考试结果吗？此操作不可恢复！')) {
+                    this.results = [];
+                    this.saveData();
+                    this.displayResults();
+                    this.showMessage('结果清空成功！', 'success');
+                }
+            }
+
+            // 面板显示
+            showPanel(panelName) {
+                // 隐藏所有面板
+                document.querySelectorAll('.panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+
+                // 显示指定面板
+                if (panelName === 'cloudConfig') {
+                    document.getElementById('cloudConfigPanel').classList.add('active');
+                } else if (panelName === 'admin') {
+                    document.getElementById('adminPanel').classList.add('active');
+                } else if (panelName === 'student') {
+                    document.getElementById('studentPanel').classList.add('active');
+                } else if (panelName === 'results') {
+                    document.getElementById('resultsPanel').classList.add('active');
+                }
+
+                // 更新导航按钮状态
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(panelName + 'Btn').classList.add('active');
+            }
+
+            // 其他方法保持与原系统相同...
+            // （这里省略了其他方法的实现，实际使用时需要完整复制）
+
+            // 显示消息
+            showMessage(message, type = 'info') {
+                // 创建消息元素
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = message;
+                
+                // 添加到页面
+                document.body.appendChild(messageDiv);
+                
+                // 3秒后自动移除
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 3000);
+            }
+
+            // 本地存储方法（降级使用）
+            loadExams() {
+                const data = localStorage.getItem('exams');
+                return data ? JSON.parse(data) : [];
+            }
+
+            saveExams() {
+                localStorage.setItem('exams', JSON.stringify(this.exams));
+            }
+
+            loadResults() {
+                const data = localStorage.getItem('results');
+                return data ? JSON.parse(data) : [];
+            }
+
+            saveResults() {
+                localStorage.setItem('results', JSON.stringify(this.results));
+            }
+        }
+
+        // 初始化系统
+        document.addEventListener('DOMContentLoaded', () => {
+            window.examSystem = new CloudExamSystem();
+        });
+    </script>
+</body>
+</html>
