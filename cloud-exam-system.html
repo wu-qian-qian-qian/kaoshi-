@@ -512,6 +512,41 @@
             margin-bottom: 10px;
         }
 
+        .exam-stats {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .average-score {
+            color: #3182ce;
+        }
+
+        .question-accuracy {
+            color: #38a169;
+        }
+
         .result-info {
             display: flex;
             gap: 20px;
@@ -745,47 +780,41 @@
         <!-- 云端配置面板 -->
         <div id="cloudConfigPanel" class="panel active">
             <div class="panel-header">
-                <h2>云端配置</h2>
-                <p>配置云端存储，实现数据同步</p>
+                <h2>🌐 云端配置</h2>
+                <p>配置云端数据存储，让所有人通过链接都能访问相同数据</p>
             </div>
-
+            
             <div class="cloud-config">
                 <div class="config-section">
-                    <h3>📋 配置步骤</h3>
+                    <h3>JSONBin.io 配置（推荐）</h3>
                     <div class="config-steps">
                         <div class="step">
                             <div class="step-number">1</div>
                             <div class="step-content">
-                                <p>访问 <a href="https://jsonbin.io/" target="_blank">JSONBin.io</a> 注册账号</p>
+                                <p>访问 <a href="https://jsonbin.io/" target="_blank">https://jsonbin.io/</a></p>
+                                <p>点击 "Create Bin" 创建新的数据存储</p>
                             </div>
                         </div>
                         <div class="step">
                             <div class="step-number">2</div>
                             <div class="step-content">
-                                <p>创建新的Bin，内容：<code>{"exams":[],"results":[]}</code></p>
+                                <p>在内容框中输入：</p>
+                                <code>{"exams":[],"results":[]}</code>
                             </div>
                         </div>
                         <div class="step">
                             <div class="step-number">3</div>
                             <div class="step-content">
-                                <p>复制Bin URL和Secret Key到下方表单</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <p>点击"测试连接"确认配置成功</p>
+                                <p>点击 "Create" 创建Bin</p>
+                                <p>复制 Bin URL 和 Secret Key</p>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="config-section">
-                    <h3>⚙️ 配置信息</h3>
+                    
                     <div class="config-form">
                         <div class="form-group">
                             <label for="binUrl">Bin URL：</label>
-                            <input type="text" id="binUrl" placeholder="https://api.jsonbin.io/v3/b/您的bin-id">
+                            <input type="text" id="binUrl" placeholder="https://api.jsonbin.io/v3/b/...">
                         </div>
                         <div class="form-group">
                             <label for="secretKey">Secret Key：</label>
@@ -797,13 +826,12 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="config-status">
-                    <div class="status-indicator">
-                        <span class="status-icon" id="connectionStatus">🔴</span>
-                        <span class="status-text" id="statusText">未连接</span>
+                    <div id="connectionStatus" class="status-indicator">
+                        <span class="status-icon">⚪</span>
+                        <span class="status-text">未连接</span>
                     </div>
-                    <div class="cloud-indicator" id="cloudStatus">💾 本地模式</div>
                 </div>
             </div>
         </div>
@@ -917,26 +945,25 @@
         <div id="studentPanel" class="panel">
             <div class="panel-header">
                 <h2>学生考试</h2>
-                <p>学生端链接：<a href="cloud-exam.html" target="_blank">cloud-exam.html</a></p>
             </div>
-            <div style="text-align: center; padding: 50px;">
-                <h3>学生考试入口</h3>
-                <p>学生可以通过以下链接参加考试：</p>
-                <div style="background: #f8fafc; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                    <code id="studentLink">https://您的用户名.github.io/您的仓库名/cloud-exam.html</code>
+            <div class="exam-list">
+                <div id="availableExams">
+                    <!-- 可用考试列表将在这里显示 -->
                 </div>
-                <p>请将此链接分享给学生使用</p>
             </div>
         </div>
 
-        <!-- 查看结果面板 -->
+        <!-- 结果查看面板 -->
         <div id="resultsPanel" class="panel">
             <div class="panel-header">
                 <h2>查看结果</h2>
-                <div class="panel-actions">
-                    <button id="refreshResultsBtn" class="btn btn-secondary">刷新结果</button>
-                    <button id="clearResultsBtn" class="btn btn-danger">清空结果</button>
-                </div>
+            </div>
+            <div class="results-controls">
+                <select id="examFilter">
+                    <option value="">所有考试</option>
+                </select>
+                <button id="refreshResultsBtn" class="btn btn-primary">刷新结果</button>
+                <button id="clearResultsBtn" class="btn btn-danger">清空结果</button>
             </div>
             <div id="resultsList">
                 <!-- 结果列表将在这里显示 -->
@@ -945,7 +972,7 @@
     </div>
 
     <script>
-        // 云端数据管理器
+        // 云端数据管理类
         class CloudDataManager {
             constructor() {
                 this.binUrl = null;
@@ -953,6 +980,7 @@
                 this.isConnected = false;
             }
 
+            // 设置配置
             setConfig(binUrl, secretKey) {
                 this.binUrl = binUrl;
                 this.secretKey = secretKey;
@@ -960,6 +988,7 @@
                 this.saveConfig();
             }
 
+            // 保存配置到本地
             saveConfig() {
                 localStorage.setItem('cloudConfig', JSON.stringify({
                     binUrl: this.binUrl,
@@ -967,6 +996,7 @@
                 }));
             }
 
+            // 加载配置
             loadConfig() {
                 const config = localStorage.getItem('cloudConfig');
                 if (config) {
@@ -984,6 +1014,7 @@
                 }
             }
 
+            // 获取数据
             async getData() {
                 if (!this.isConnected) {
                     throw new Error('未配置云端存储');
@@ -1008,6 +1039,7 @@
                 }
             }
 
+            // 保存数据
             async saveData(data) {
                 if (!this.isConnected) {
                     throw new Error('未配置云端存储');
@@ -1034,6 +1066,7 @@
                 }
             }
 
+            // 测试连接
             async testConnection() {
                 console.log('测试连接 - binUrl:', this.binUrl);
                 console.log('测试连接 - secretKey:', this.secretKey ? '已设置' : '未设置');
@@ -1125,8 +1158,9 @@
                 }
             }
 
+            // 绑定事件
             bindEvents() {
-                // 导航
+                // 面板切换
                 document.getElementById('cloudConfigBtn').addEventListener('click', () => this.showPanel('cloudConfig'));
                 document.getElementById('adminBtn').addEventListener('click', () => this.showPanel('admin'));
                 document.getElementById('studentBtn').addEventListener('click', () => this.showPanel('student'));
@@ -1173,10 +1207,67 @@
                     this.showMessage('连接成功！云端存储已配置', 'success');
                     this.updateCloudStatus();
                     await this.loadData();
+                    
+                    // 保存配置到公开文件供学生端使用
+                    await this.savePublicConfig(binUrl, secretKey);
                 } catch (error) {
                     console.error('连接测试详细错误：', error);
                     this.showMessage('连接失败：' + error.message, 'error');
                     this.updateCloudStatus();
+                }
+            }
+
+            // 保存公开配置供学生端使用
+            async savePublicConfig(binUrl, secretKey) {
+                try {
+                    const publicConfig = {
+                        binUrl: binUrl,
+                        secretKey: secretKey,
+                        lastUpdate: new Date().toISOString(),
+                        status: "configured"
+                    };
+                    
+                    // 保存到localStorage作为备份
+                    localStorage.setItem('publicCloudConfig', JSON.stringify(publicConfig));
+                    
+                    // 保存到JSON文件供学生端读取
+                    await this.saveConfigToFile(publicConfig);
+                    
+                    // 尝试保存到云端数据中
+                    if (this.cloudManager.isConnected) {
+                        const data = await this.cloudManager.getData();
+                        data.publicConfig = publicConfig;
+                        await this.cloudManager.saveData(data);
+                    }
+                    
+                    console.log('公开配置已保存');
+                } catch (error) {
+                    console.error('保存公开配置失败：', error);
+                }
+            }
+
+            // 保存配置到JSON文件
+            async saveConfigToFile(config) {
+                try {
+                    // 由于浏览器安全限制，我们无法直接写入文件
+                    // 但我们可以提供下载链接
+                    const configStr = JSON.stringify(config, null, 2);
+                    const blob = new Blob([configStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // 创建下载链接
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'cloud-config.json';
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    console.log('配置文件已生成，请将cloud-config.json放在服务器根目录');
+                } catch (error) {
+                    console.error('保存配置文件失败：', error);
                 }
             }
 
@@ -1564,27 +1655,85 @@
                     resultsByExam[examName].push(result);
                 });
 
-                container.innerHTML = Object.keys(resultsByExam).map(examName => `
-                    <div class="exam-results">
-                        <div class="exam-header">
-                            <h4>${examName}</h4>
-                            <button class="btn btn-info btn-sm" onclick="examSystem.showDetailedAnalysis('${examName}')">详细分析</button>
-                        </div>
-                        <div class="results-list">
-                            ${resultsByExam[examName].map(result => `
-                                <div class="result-item">
-                                    <div class="result-info">
-                                        <span class="student-name">${result.studentName}</span>
-                                        <span class="student-id">学号：${result.studentId}</span>
-                                        <span class="exam-code">考号：${result.examCode}</span>
-                                        <span class="score">得分：${result.score}/${result.totalQuestions}</span>
-                                    </div>
-                                    <div class="result-time">${new Date(result.submitTime).toLocaleString()}</div>
+                container.innerHTML = Object.keys(resultsByExam).map(examName => {
+                    const examResults = resultsByExam[examName];
+                    const exam = this.exams.find(e => e.name === examName);
+                    
+                    // 计算平均分
+                    const totalScore = examResults.reduce((sum, result) => sum + result.score, 0);
+                    const averageScore = (totalScore / examResults.length).toFixed(1);
+                    
+                    // 计算每道题的正确率
+                    const questionAccuracy = this.calculateQuestionAccuracy(exam, examResults);
+                    
+                    return `
+                        <div class="exam-results">
+                            <div class="exam-header">
+                                <h4>${examName}</h4>
+                                <button class="btn btn-info btn-sm" onclick="examSystem.showDetailedAnalysis('${examName}')">详细分析</button>
+                            </div>
+                            <div class="exam-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">参考人数</div>
+                                    <div class="stat-value">${examResults.length}人</div>
                                 </div>
-                            `).join('')}
+                                <div class="stat-item">
+                                    <div class="stat-label">平均分</div>
+                                    <div class="stat-value average-score">${averageScore}分</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">题目正确率</div>
+                                    <div class="stat-value question-accuracy">${questionAccuracy}%</div>
+                                </div>
+                            </div>
+                            <div class="results-list">
+                                ${examResults.map(result => `
+                                    <div class="result-item">
+                                        <div class="result-info">
+                                            <span class="student-name">${result.studentName}</span>
+                                            <span class="student-id">学号：${result.studentId}</span>
+                                            <span class="exam-code">考号：${result.examCode}</span>
+                                            <span class="score">得分：${result.score}/${result.totalQuestions}</span>
+                                        </div>
+                                        <div class="result-time">${new Date(result.submitTime).toLocaleString()}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
+            }
+
+            // 计算每道题的正确率
+            calculateQuestionAccuracy(exam, examResults) {
+                if (!exam || !exam.questions || exam.questions.length === 0 || examResults.length === 0) {
+                    return '0.0';
+                }
+
+                let totalCorrectAnswers = 0;
+                let totalQuestions = exam.questions.length * examResults.length;
+
+                exam.questions.forEach((question, questionIndex) => {
+                    const correctAnswer = question.answer;
+                    examResults.forEach(result => {
+                        // 确保 answers 是数组格式
+                        let studentAnswer;
+                        if (Array.isArray(result.answers)) {
+                            studentAnswer = result.answers[questionIndex];
+                        } else if (result.answers && typeof result.answers === 'object') {
+                            studentAnswer = result.answers[questionIndex];
+                        } else {
+                            studentAnswer = null;
+                        }
+
+                        if (studentAnswer === correctAnswer) {
+                            totalCorrectAnswers++;
+                        }
+                    });
+                });
+
+                const accuracy = (totalCorrectAnswers / totalQuestions * 100).toFixed(1);
+                return accuracy;
             }
 
             // 详细分析功能
@@ -1775,5 +1924,6 @@
             window.examSystem = new CloudExamSystem();
         });
     </script>
+
 </body>
 </html>
