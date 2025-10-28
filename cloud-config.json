@@ -2,5 +2,5 @@
   "binUrl": "https://api.jsonbin.io/v3/b/69003133d0ea881f40c12e00",
   "secretKey": "$2a$10$sggvChdliZ723R9fzKiRtOz3GfRuWl9f1zUzH2oR1NsMAJiDcZYRC",
   "lastUpdate": "2025-10-28T03:42:22.160Z",
-  "status": "not_configured"
+  "status": "configured"
 }
