@@ -682,6 +682,14 @@
             color: #742a2a;
         }
 
+        .question-accuracy-cell {
+            background: #e6fffa;
+            color: #234e52;
+            font-weight: 600;
+            text-align: center;
+            font-size: 14px;
+        }
+
         .exam-header {
             display: flex;
             justify-content: space-between;
@@ -1345,12 +1353,41 @@
                     return;
                 }
 
-                if (confirm('确定要删除这个考试吗？此操作不可恢复！')) {
+                const exam = this.exams.find(e => e.id === this.selectedExamId);
+                if (!exam) {
+                    this.showMessage('考试不存在！', 'error');
+                    return;
+                }
+
+                // 检查是否有考试结果
+                const examResults = this.results.filter(result => result.examId === this.selectedExamId);
+                const hasResults = examResults.length > 0;
+
+                let confirmMessage = '确定要删除这个考试吗？此操作不可恢复！';
+                if (hasResults) {
+                    confirmMessage += `\n\n注意：该考试有 ${examResults.length} 条考试结果，删除考试将同时删除所有相关结果！`;
+                }
+
+                if (confirm(confirmMessage)) {
+                    // 删除考试
                     this.exams = this.exams.filter(exam => exam.id !== this.selectedExamId);
+                    
+                    // 删除相关的考试结果
+                    if (hasResults) {
+                        this.results = this.results.filter(result => result.examId !== this.selectedExamId);
+                    }
+                    
                     this.saveData();
                     this.displayExams();
+                    this.displayResults(); // 更新结果显示
+                    this.displayAvailableExams(); // 更新学生端显示
                     this.updateCurrentExamInfo();
-                    this.showMessage('考试删除成功！', 'success');
+                    
+                    if (hasResults) {
+                        this.showMessage(`考试和 ${examResults.length} 条相关结果已删除！`, 'success');
+                    } else {
+                        this.showMessage('考试删除成功！', 'success');
+                    }
                 }
             }
 
@@ -1365,6 +1402,7 @@
                     exam.isPublished = true;
                     this.saveData();
                     this.displayExams();
+                    this.displayAvailableExams(); // 更新学生端显示
                     this.updateCurrentExamInfo();
                     this.showMessage('考试发布成功！', 'success');
                 }
@@ -1381,6 +1419,7 @@
                     exam.isPublished = false;
                     this.saveData();
                     this.displayExams();
+                    this.displayAvailableExams(); // 更新学生端显示
                     this.updateCurrentExamInfo();
                     this.showMessage('考试已取消发布！', 'success');
                 }
@@ -1714,7 +1753,7 @@
                 let totalQuestions = exam.questions.length * examResults.length;
 
                 exam.questions.forEach((question, questionIndex) => {
-                    const correctAnswer = question.answer;
+                    const correctAnswer = question.correctAnswer;
                     examResults.forEach(result => {
                         // 确保 answers 是数组格式
                         let studentAnswer;
@@ -1736,6 +1775,37 @@
                 return accuracy;
             }
 
+            // 计算每道题的正确率（返回数组）
+            calculateQuestionAccuracies(exam, examResults) {
+                if (!exam || !exam.questions || exam.questions.length === 0 || examResults.length === 0) {
+                    return [];
+                }
+
+                return exam.questions.map((question, questionIndex) => {
+                    let correctCount = 0;
+                    const totalStudents = examResults.length;
+
+                    examResults.forEach(result => {
+                        // 确保 answers 是数组格式
+                        let studentAnswer;
+                        if (Array.isArray(result.answers)) {
+                            studentAnswer = result.answers[questionIndex];
+                        } else if (result.answers && typeof result.answers === 'object') {
+                            studentAnswer = result.answers[questionIndex];
+                        } else {
+                            studentAnswer = null;
+                        }
+
+                        if (studentAnswer === question.correctAnswer) {
+                            correctCount++;
+                        }
+                    });
+
+                    const accuracy = (correctCount / totalStudents * 100).toFixed(1);
+                    return accuracy;
+                });
+            }
+
             // 详细分析功能
             showDetailedAnalysis(examName) {
                 const exam = this.exams.find(e => e.name === examName);
@@ -1755,6 +1825,9 @@
             }
 
             createAnalysisModal(exam, results) {
+                // 计算每道题的正确率
+                const questionAccuracies = this.calculateQuestionAccuracies(exam, results);
+                
                 // 创建模态框
                 const modal = document.createElement('div');
                 modal.className = 'analysis-modal';
@@ -1774,6 +1847,7 @@
                                         <tr>
                                             <th>题目</th>
                                             <th>正确答案</th>
+                                            <th>正确率</th>
                                             ${results.map(result => `<th>${result.studentName}</th>`).join('')}
                                         </tr>
                                     </thead>
@@ -1782,6 +1856,7 @@
                                             <tr>
                                                 <td class="question-cell">题目${index + 1}：${question.text}</td>
                                                 <td class="correct-answer">${question.correctAnswer}</td>
+                                                <td class="question-accuracy-cell">${questionAccuracies[index]}%</td>
                                                 ${results.map(result => {
                                                     const studentAnswer = result.answers[index] || '未答';
                                                     const isCorrect = studentAnswer === question.correctAnswer;
@@ -1814,15 +1889,19 @@
                 }
 
                 try {
+                    // 计算每道题的正确率
+                    const questionAccuracies = this.calculateQuestionAccuracies(exam, examResults);
+                    
                     // 准备导出数据
                     const exportData = [
-                        ['题目', '正确答案', ...examResults.map(result => result.studentName)]
+                        ['题目', '正确答案', '正确率', ...examResults.map(result => result.studentName)]
                     ];
 
                     exam.questions.forEach((question, index) => {
                         const row = [
                             `题目${index + 1}：${question.text}`,
                             question.correctAnswer,
+                            `${questionAccuracies[index]}%`,
                             ...examResults.map(result => {
                                 const studentAnswer = result.answers[index] || '未答';
                                 return studentAnswer;
@@ -1853,6 +1932,29 @@
                 }
             }
 
+            // 显示学生端可用考试
+            displayAvailableExams() {
+                const container = document.getElementById('availableExams');
+                if (!container) return;
+
+                // 只显示已发布的考试
+                const publishedExams = this.exams.filter(exam => exam.isPublished);
+                
+                if (publishedExams.length === 0) {
+                    container.innerHTML = '<p>暂无可用考试</p>';
+                    return;
+                }
+
+                container.innerHTML = publishedExams.map(exam => `
+                    <div class="exam-item">
+                        <h4>${exam.name}</h4>
+                        <p>题目数量：${exam.questions.length} 道</p>
+                        <p>考号范围：${exam.allowedCodes.join(', ')}</p>
+                        <p>状态：已发布</p>
+                    </div>
+                `).join('');
+            }
+
             // 面板显示
             showPanel(panelName) {
                 // 隐藏所有面板
@@ -1867,6 +1969,7 @@
                     document.getElementById('adminPanel').classList.add('active');
                 } else if (panelName === 'student') {
                     document.getElementById('studentPanel').classList.add('active');
+                    this.displayAvailableExams(); // 显示学生端可用考试
                 } else if (panelName === 'results') {
                     document.getElementById('resultsPanel').classList.add('active');
                 }
