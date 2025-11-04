@@ -974,25 +974,20 @@
             }
 
             async saveData() {
-                try {
-                    if (this.cloudManager.isConnected) {
-                        const data = {
-                            exams: this.exams,
-                            results: this.results,
-                            version: this.version,
-                            lastUpdate: new Date().toISOString()
-                        };
-                        await this.cloudManager.saveData(data);
-                        console.log('云端数据保存成功');
-                    } else {
-                        this.saveExams();
-                        this.saveResults();
-                        console.log('本地数据保存成功');
-                    }
-                } catch (error) {
-                    console.error('保存数据失败，降级到本地存储：', error);
+                if (this.cloudManager.isConnected) {
+                    const data = {
+                        exams: this.exams,
+                        results: this.results,
+                        version: this.version,
+                        lastUpdate: new Date().toISOString()
+                    };
+                    await this.cloudManager.saveData(data);
+                    console.log('云端数据保存成功');
+                } else {
+                    // 如果没有云端连接，保存到本地
                     this.saveExams();
                     this.saveResults();
+                    console.log('本地数据保存成功');
                 }
             }
 
@@ -1190,32 +1185,119 @@
                 }
                 
                 if (confirm(confirmMessage)) {
-                    let score = 0;
-                    let answeredCorrectly = 0;
+                    // 显示提交中状态
+                    const submitBtn = document.getElementById('submitExamBtn');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '正在提交...';
                     
-                    exam.questions.forEach((question, index) => {
-                        if (this.studentAnswers[index] === question.correctAnswer) {
-                            score++;
-                            answeredCorrectly++;
+                    try {
+                        let score = 0;
+                        let answeredCorrectly = 0;
+                        
+                        exam.questions.forEach((question, index) => {
+                            if (this.studentAnswers[index] === question.correctAnswer) {
+                                score++;
+                                answeredCorrectly++;
+                            }
+                        });
+
+                        // 创建结果对象，添加唯一ID
+                        const result = {
+                            id: `${this.selectedExamId}-${this.currentStudent.id}-${this.verifiedExamCode}-${Date.now()}`,
+                            examId: this.selectedExamId,
+                            studentName: this.currentStudent.name,
+                            studentId: this.currentStudent.id,
+                            examCode: this.verifiedExamCode,
+                            answers: this.studentAnswers,
+                            score: score,
+                            totalQuestions: exam.questions.length,
+                            answeredQuestions: answeredQuestions,
+                            unansweredQuestions: unansweredQuestions,
+                            submitTime: new Date().toISOString()
+                        };
+
+                        // 使用带重试的保存方法
+                        await this.saveDataWithRetry(result);
+                        
+                        // 恢复按钮状态
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                        
+                        this.showResult(result);
+                    } catch (error) {
+                        console.error('提交失败：', error);
+                        alert('提交失败：' + error.message + '\n请刷新页面重试，或联系管理员。');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                }
+            }
+
+            // 带重试机制的数据保存方法
+            async saveDataWithRetry(newResult, maxRetries = 3) {
+                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    try {
+                        if (attempt > 0) {
+                            // 重试前等待，避免频繁请求
+                            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                            console.log(`第 ${attempt + 1} 次尝试保存数据...`);
                         }
-                    });
 
-                    const result = {
-                        examId: this.selectedExamId,
-                        studentName: this.currentStudent.name,
-                        studentId: this.currentStudent.id,
-                        examCode: this.verifiedExamCode,
-                        answers: this.studentAnswers,
-                        score: score,
-                        totalQuestions: exam.questions.length,
-                        answeredQuestions: answeredQuestions,
-                        unansweredQuestions: unansweredQuestions,
-                        submitTime: new Date().toISOString()
-                    };
+                        // 1. 重新加载云端最新数据（防止并发冲突）
+                        let latestData;
+                        if (this.cloudManager.isConnected) {
+                            try {
+                                latestData = await this.cloudManager.getData();
+                            } catch (error) {
+                                console.warn('重新加载云端数据失败，使用本地数据：', error);
+                                // 如果云端加载失败，使用本地数据
+                                latestData = {
+                                    exams: this.exams,
+                                    results: this.results
+                                };
+                            }
+                        } else {
+                            // 如果没有云端连接，使用本地数据
+                            latestData = {
+                                exams: this.exams,
+                                results: this.results
+                            };
+                        }
 
-                    this.results.push(result);
-                    await this.saveData();
-                    this.showResult(result);
+                        const latestResults = latestData.results || [];
+
+                        // 2. 检查是否已存在（防止重复提交）
+                        const exists = latestResults.some(r => 
+                            r.examId === newResult.examId && 
+                            r.studentId === newResult.studentId &&
+                            r.examCode === newResult.examCode
+                        );
+
+                        if (exists) {
+                            throw new Error('您已经提交过本次考试了！');
+                        }
+
+                        // 3. 合并数据（将新结果添加到最新数据中）
+                        const mergedResults = [...latestResults, newResult];
+
+                        // 4. 更新本地数据
+                        this.results = mergedResults;
+                        this.exams = latestData.exams || this.exams;
+
+                        // 5. 保存合并后的数据
+                        await this.saveData();
+                        
+                        console.log('数据保存成功！');
+                        return; // 成功，退出重试循环
+                    } catch (error) {
+                        console.error(`保存失败（尝试 ${attempt + 1}/${maxRetries}）：`, error);
+                        
+                        // 如果是最后一次尝试，抛出错误
+                        if (attempt === maxRetries - 1) {
+                            throw new Error(`保存失败，已重试 ${maxRetries} 次：${error.message}`);
+                        }
+                    }
                 }
             }
 
